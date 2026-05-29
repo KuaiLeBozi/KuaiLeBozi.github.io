@@ -18,6 +18,8 @@
   --shadow: 0 16px 34px rgba(17, 72, 139, 0.16);
   --dialog-lane: 56px;
   --mobile-player-clearance: 210px;
+  --mobile-bg-overscan: 260px;
+  --mobile-bg-top-bleed: 130px;
 }
 
 *,
@@ -1183,12 +1185,13 @@ a {
   .live-background,
   .scene-overlay,
   .hud-grid {
-    height: calc(100vh + 260px);
-    height: calc(100dvh + 260px);
-    min-height: calc(100lvh + 260px);
+    height: calc(100vh + var(--mobile-bg-overscan));
+    height: calc(100dvh + var(--mobile-bg-overscan));
+    min-height: calc(100lvh + var(--mobile-bg-overscan));
   }
 
   .live-background {
+    top: calc(var(--mobile-bg-top-bleed) * -1);
     bottom: auto;
   }
 
