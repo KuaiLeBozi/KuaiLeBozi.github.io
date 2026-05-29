@@ -17,15 +17,19 @@
     {
       "id": "diffusion",
       "type": "Research",
-      "title": "Diffusion 方向实习",
+      "title": "loop transformer方向",
       "summary": "围绕生成模型、图像生成与扩散模型实践做学习和实验记录，逐步沉淀可复现的小项目。",
-      "status": "实习 / 研究中",
+      "status": "研究中",
       "updated": "2026-05-29",
-      "tags": ["Diffusion", "Generative AI", "Research"],
+      "tags": [
+        "Diffusion",
+        "Generative AI",
+        "Research，transformer"
+      ],
       "sections": [
         {
           "heading": "当前目标",
-          "body": "系统整理 diffusion 相关基础、常用训练流程和推理优化方法，把实习中的学习内容沉淀成清晰的记录。"
+          "body": "系统整理 transformer相关基础、常用训练流程和推理优化方法，把实习中的学习内容沉淀成清晰的记录。"
         },
         {
           "heading": "计划内容",
@@ -37,7 +41,8 @@
           "label": "返回 GitHub",
           "url": "https://github.com/KuaiLeBozi"
         }
-      ]
+      ],
+      "description": "围绕生成模型、图像生成与扩散模型实践做学习和实验记录，逐步沉淀可复现的小项目。"
     },
     {
       "id": "security",
@@ -46,7 +51,11 @@
       "summary": "整理网络空间安全课程、竞赛训练、工程实践与安全研究中的笔记和资料。",
       "status": "持续整理",
       "updated": "2026-05-29",
-      "tags": ["Cybersecurity", "HUST", "Notes"],
+      "tags": [
+        "Cybersecurity",
+        "HUST",
+        "Notes"
+      ],
       "sections": [
         {
           "heading": "记录范围",
@@ -71,7 +80,11 @@
       "summary": "把喜欢的视觉风格、动态背景、固定音乐播放器和评论区组合成可访问的个人空间。",
       "status": "上线调试中",
       "updated": "2026-05-29",
-      "tags": ["GitHub Pages", "Frontend", "Blue Archive"],
+      "tags": [
+        "GitHub Pages",
+        "Frontend",
+        "Blue Archive"
+      ],
       "sections": [
         {
           "heading": "已经完成",
