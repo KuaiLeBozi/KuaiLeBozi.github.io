@@ -32,6 +32,10 @@
     heroActions: $("#heroActions"),
     loadingProgress: $("#loadingProgress"),
     loadingLabel: $("#loadingLabel"),
+    opacityControl: $("#opacityControl"),
+    opacityToggle: $("#opacityToggle"),
+    opacityRange: $("#opacityRange"),
+    opacityValue: $("#opacityValue"),
     profileName: $("#profileName"),
     profileText: $("#profileText"),
     factList: $("#factList"),
@@ -267,6 +271,35 @@
     elements.customCursor.style.transform = `translate(${event.clientX}px, ${event.clientY}px)`;
   }
 
+  function applyOpacity(value) {
+    const opacity = Math.max(25, Math.min(Number(value) || 46, 90));
+    const normalized = opacity / 100;
+    document.documentElement.style.setProperty("--panel-alpha", normalized.toFixed(2));
+    document.documentElement.style.setProperty("--panel-strong-alpha", Math.min(normalized + 0.16, 0.96).toFixed(2));
+    document.documentElement.style.setProperty("--topbar-alpha", Math.max(normalized - 0.12, 0.18).toFixed(2));
+    elements.opacityRange.value = String(opacity);
+    elements.opacityValue.textContent = `${opacity}%`;
+    try {
+      localStorage.setItem("kuai-panel-opacity", String(opacity));
+    } catch (_) {
+      // Storage can be unavailable in strict privacy modes; the live control still works.
+    }
+  }
+
+  function initOpacityControl() {
+    let saved = elements.opacityRange.value;
+    try {
+      saved = localStorage.getItem("kuai-panel-opacity") || saved;
+    } catch (_) {
+      // Keep the default when storage is unavailable.
+    }
+    applyOpacity(saved);
+    elements.opacityToggle.addEventListener("click", () => {
+      elements.opacityControl.classList.toggle("is-open");
+    });
+    elements.opacityRange.addEventListener("input", () => applyOpacity(elements.opacityRange.value));
+  }
+
   function bindEvents() {
     elements.enterButton.addEventListener("click", autoEnterSite);
     elements.playPauseButton.addEventListener("click", togglePlay);
@@ -292,6 +325,12 @@
 
     elements.memoryLobby.addEventListener("ended", () => {
       if (state.lobbySwitched) return;
+      const duration = elements.memoryLobby.duration;
+      const hasEndedNaturally =
+        Number.isFinite(duration) && duration > 0
+          ? elements.memoryLobby.currentTime >= duration - 0.15
+          : elements.memoryLobby.ended;
+      if (!hasEndedNaturally) return;
       state.lobbySwitched = true;
       elements.memoryLobby.src = "assets/media/CH0295_home_Idle_01.webm";
       elements.memoryLobby.loop = true;
@@ -301,6 +340,7 @@
 
   renderContent();
   loadTrack(0, false);
+  initOpacityControl();
   bindEvents();
   enterWhenLobbyReady();
   }
