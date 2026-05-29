@@ -11,6 +11,7 @@
     muted: false,
     lobbySwitched: false,
     lobbyVideoUrls: {},
+    mediaCacheReady: Promise.resolve(),
     audio: new Audio(),
   };
   const backgroundVideos = [
@@ -20,6 +21,7 @@
   const videoCacheName = "kuailebozi-background-videos-v1";
   const videoDbName = "kuailebozi-background-videos";
   const videoStoreName = "videos";
+  const serviceWorkerPath = "sw.js";
 
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => Array.from(document.querySelectorAll(selector));
@@ -271,7 +273,7 @@
     });
   }
 
-  async function loadCachedVideo(src, onProgress) {
+  async function cacheVideo(src, onProgress) {
     let cache = null;
     let cached = null;
 
@@ -284,15 +286,14 @@
     }
 
     if (cached) {
-      const blob = await cached.blob();
       onProgress(1);
-      return URL.createObjectURL(blob);
+      return src;
     }
 
     const indexedDbBlob = await getVideoFromIndexedDb(src);
     if (indexedDbBlob) {
       onProgress(1);
-      return URL.createObjectURL(indexedDbBlob);
+      return src;
     }
 
     const response = await fetch(src, { cache: "force-cache" });
@@ -309,10 +310,20 @@
       }
     }
     await putVideoInIndexedDb(src, blob);
-    return URL.createObjectURL(blob);
+    return src;
   }
 
   async function cacheLobbyVideos() {
+    await state.mediaCacheReady;
+
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+      updateLoadingProgress(1);
+      backgroundVideos.forEach((src) => {
+        state.lobbyVideoUrls[src] = src;
+      });
+      return;
+    }
+
     const progressByVideo = new Map(backgroundVideos.map((src) => [src, 0]));
     const updateTotalProgress = (src, ratio) => {
       progressByVideo.set(src, Math.max(0, Math.min(ratio, 1)));
@@ -320,12 +331,12 @@
       updateLoadingProgress(total / backgroundVideos.length);
     };
 
-    const cachedUrls = await Promise.all(
-      backgroundVideos.map((src) => loadCachedVideo(src, (ratio) => updateTotalProgress(src, ratio)))
+    await Promise.all(
+      backgroundVideos.map((src) => cacheVideo(src, (ratio) => updateTotalProgress(src, ratio)))
     );
 
-    backgroundVideos.forEach((src, index) => {
-      state.lobbyVideoUrls[src] = cachedUrls[index];
+    backgroundVideos.forEach((src) => {
+      state.lobbyVideoUrls[src] = src;
     });
   }
 
@@ -356,14 +367,33 @@
     });
   }
 
-  async function warmVideo(video) {
-    await video.play().catch(() => {});
-    video.pause();
+  function seekToStart(video) {
     try {
       video.currentTime = 0;
     } catch (_) {
-      // Some media containers do not allow precise seeks before the first visible play.
+      // Some media containers do not allow precise seeks before metadata is fully settled.
     }
+  }
+
+  function registerVideoServiceWorker() {
+    if (!("serviceWorker" in navigator)) {
+      return Promise.resolve();
+    }
+
+    return navigator.serviceWorker
+      .register(serviceWorkerPath)
+      .then(() => navigator.serviceWorker.ready)
+      .then(() => {
+        if (navigator.serviceWorker.controller) {
+          return undefined;
+        }
+
+        return new Promise((resolve) => {
+          navigator.serviceWorker.addEventListener("controllerchange", () => resolve(), { once: true });
+          window.setTimeout(resolve, 1500);
+        });
+      })
+      .catch(() => {});
   }
 
   async function enterWhenLobbyReady() {
@@ -386,7 +416,6 @@
         waitForVideoReady(elements.memoryLobby),
         waitForVideoReady(elements.memoryLobbyIdle),
       ]);
-      await warmVideo(elements.memoryLobbyIdle);
       await elements.memoryLobby.play().catch(() => {});
       finish();
     } catch (_) {
@@ -457,19 +486,16 @@
 
     elements.memoryLobby.addEventListener("ended", () => {
       if (state.lobbySwitched) return;
-      const duration = elements.memoryLobby.duration;
-      const hasEndedNaturally =
-        Number.isFinite(duration) && duration > 0
-          ? elements.memoryLobby.currentTime >= duration - 0.15
-          : elements.memoryLobby.ended;
-      if (!hasEndedNaturally) return;
       state.lobbySwitched = true;
+      elements.memoryLobby.pause();
+      seekToStart(elements.memoryLobbyIdle);
       elements.memoryLobby.classList.remove("is-visible");
       elements.memoryLobbyIdle.classList.add("is-visible");
       elements.memoryLobbyIdle.play().catch(() => {});
     });
   }
 
+  state.mediaCacheReady = registerVideoServiceWorker();
   renderContent();
   loadTrack(0, false);
   bindEvents();
