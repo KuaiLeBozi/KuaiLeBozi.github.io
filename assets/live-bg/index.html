@@ -4,16 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dynamic Background</title>
-    <link rel="stylesheet" href="./assets/live-background.css?v=blog-1" />
+    <link rel="stylesheet" href="./assets/live-background.css?v=dialog-gap-5" />
     <style>
       .setting-button,
       .setting,
-      .badialog,
       #loading {
         display: none !important;
       }
 
-      .badialog {
+      #badialog.badialog {
         opacity: 0 !important;
         visibility: hidden !important;
         pointer-events: none !important;
@@ -24,23 +23,6 @@
     <div id="app"></div>
     <script>
       (() => {
-        window.__LIVE_BG_FIT__ = {
-          desktop: {
-            baseWidth: 2560,
-            baseHeight: 1440,
-            baseX: 1282,
-            baseY: 1433,
-            baseScale: 0.75,
-          },
-          portrait: {
-            xRatio: 0.5,
-            yRatio: 0.92,
-            minScale: 0.34,
-            maxScale: 0.44,
-            scaleDivisor: 1150,
-          },
-        };
-
         const originalXHRSend = XMLHttpRequest.prototype.send;
         const nativeGetItem = Storage.prototype.getItem;
         const nativeSetItem = Storage.prototype.setItem;
@@ -56,31 +38,19 @@
             try {
               const data = JSON.parse(this.responseText);
               const model = data.SettingModel;
-              const fit = window.__LIVE_BG_FIT__;
-              const isPortrait = window.innerWidth <= 700 || window.innerHeight > window.innerWidth * 1.15;
-              const desktopFit = fit.desktop;
-              const cover = Math.max(
-                window.innerWidth / desktopFit.baseWidth,
-                window.innerHeight / desktopFit.baseHeight
-              );
-              const portraitScale = Math.min(
-                fit.portrait.maxScale,
-                Math.max(fit.portrait.minScale, window.innerWidth / fit.portrait.scaleDivisor)
-              );
 
-              model.version = 9006;
+              const isPortrait = window.innerWidth <= 700 || window.innerHeight > window.innerWidth * 1.15;
+
+              model.version = 9010;
               model.resolution = "2k";
-              model.x = isPortrait
-                ? Math.round(window.innerWidth * fit.portrait.xRatio)
-                : Math.round(desktopFit.baseX * cover + (window.innerWidth - desktopFit.baseWidth * cover) / 2);
-              model.y = isPortrait
-                ? Math.round(window.innerHeight * fit.portrait.yRatio)
-                : Math.round(desktopFit.baseY * cover + (window.innerHeight - desktopFit.baseHeight * cover) / 2);
-              model.scale = Number((isPortrait ? portraitScale : desktopFit.baseScale * cover).toFixed(4));
+              if (isPortrait) {
+                model.x = Math.round(window.innerWidth * 0.28);
+              }
               model.bgmVolume = 0;
+              model.talkVolume = 0.82;
               model.panelDisplay = false;
               model.showTouch = false;
-              model.showTalkDialog = false;
+              model.showTalkDialog = true;
 
               Object.defineProperty(this, "responseText", { value: JSON.stringify(data) });
               Object.defineProperty(this, "response", { value: JSON.stringify(data) });
@@ -130,8 +100,42 @@
         HTMLMediaElement.prototype.pause = function () {
           return nativePause.call(this);
         };
+
+        function postDialogState() {
+          const dialog = document.getElementById("badialog");
+          if (!dialog) return;
+
+          window.parent?.postMessage({
+            source: "kuailebozi-live-dialog",
+            visible: dialog.classList.contains("opacity-in"),
+            text: dialog.textContent.trim(),
+          }, window.location.origin);
+        }
+
+        function initDialogBridge() {
+          const dialog = document.getElementById("badialog");
+          if (!dialog) {
+            window.setTimeout(initDialogBridge, 100);
+            return;
+          }
+
+          const observer = new MutationObserver(postDialogState);
+          observer.observe(dialog, {
+            attributes: true,
+            childList: true,
+            characterData: true,
+            subtree: true,
+          });
+          postDialogState();
+        }
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", initDialogBridge, { once: true });
+        } else {
+          initDialogBridge();
+        }
       })();
     </script>
-    <script type="module" src="./assets/live-background.js?v=blog-1"></script>
+    <script type="module" src="./assets/live-background.js?v=dialog-gap-5"></script>
   </body>
 </html>

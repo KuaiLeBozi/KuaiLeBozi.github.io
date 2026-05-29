@@ -10,13 +10,13 @@
     <title>KuaileBozi</title>
     <link rel="icon" type="image/png" sizes="32x32" href="assets/media/favicon-32.png?v=icon-2" />
     <link rel="apple-touch-icon" href="assets/media/apple-touch-icon.png?v=icon-2" />
-    <link rel="stylesheet" href="assets/css/styles.css?v=blog-1" />
+    <link rel="stylesheet" href="assets/css/styles.css?v=dialog-gap-5" />
   </head>
   <body>
     <iframe
       class="live-background"
       id="liveBackground"
-      src="assets/live-bg/index.html?v=blog-1"
+      src="assets/live-bg/index.html?v=dialog-gap-5"
       title=""
       tabindex="-1"
       aria-hidden="true"
@@ -67,9 +67,13 @@
               <select class="music-select" id="musicSelect" aria-label="选择歌曲"></select>
               <button class="music-control" id="musicNext" type="button" aria-label="下一首">&gt;</button>
             </div>
+            <div class="music-volume" aria-label="音量调节">
+              <button class="music-control" id="musicVolumeDown" type="button" aria-label="降低音量">-</button>
+              <span id="musicVolumeLabel">38%</span>
+              <button class="music-control" id="musicVolumeUp" type="button" aria-label="提高音量">+</button>
+            </div>
           </div>
           <audio id="siteMusic" preload="auto"></audio>
-          <audio id="voiceAudio" preload="auto"></audio>
         </aside>
 
         <section class="home-layout" id="home">
@@ -144,12 +148,14 @@
       </section>
     </main>
 
+    <div class="live-dialog" id="liveDialog" aria-live="polite"></div>
+
     <noscript>
       <p class="noscript">请启用 JavaScript 以加载动态背景与个人档案内容。</p>
     </noscript>
 
-    <script defer src="assets/js/global-ui.js?v=blog-1"></script>
-    <script defer src="assets/js/site-config.js?v=blog-1"></script>
-    <script defer src="assets/js/app.js?v=blog-1"></script>
+    <script defer src="assets/js/global-ui.js?v=dialog-gap-5"></script>
+    <script defer src="assets/js/site-config.js?v=dialog-gap-5"></script>
+    <script defer src="assets/js/app.js?v=dialog-gap-5"></script>
   </body>
 </html>

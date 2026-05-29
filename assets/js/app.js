@@ -13,7 +13,6 @@
       musicIndex: 0,
       musicReady: false,
       musicPlaying: false,
-      voiceIndex: 0,
       projects: [],
       playerDragging: false,
       playerMoved: false,
@@ -27,20 +26,6 @@
       { title: "Thanks to (KR Ver.)", src: "assets/music/thanks-to-kr-ver.mp3" },
       { title: "Hifumi Daisuki", src: "assets/music/hifumi-daisuki-ost.mp3" },
       { title: "Dolce Biblioteca", src: "assets/music/dolce-biblioteca-ost.mp3" },
-    ];
-
-    const voiceTracks = [
-      "assets/live-bg/sound/CH0295_MemorialLobby_1_1.wav",
-      "assets/live-bg/sound/CH0295_MemorialLobby_1_2.wav",
-      "assets/live-bg/sound/CH0295_MemorialLobby_2_1.wav",
-      "assets/live-bg/sound/CH0295_MemorialLobby_2_2.wav",
-      "assets/live-bg/sound/CH0295_MemorialLobby_3_1.wav",
-      "assets/live-bg/sound/CH0295_MemorialLobby_3_2.wav",
-      "assets/live-bg/sound/CH0295_MemorialLobby_4_1.wav",
-      "assets/live-bg/sound/CH0295_MemorialLobby_4_2.wav",
-      "assets/live-bg/sound/CH0295_MemorialLobby_5_1.wav",
-      "assets/live-bg/sound/CH0295_MemorialLobby_5_2.wav",
-      "assets/live-bg/sound/CH0295_MemorialLobby_5_3.wav",
     ];
 
     const $ = (selector) => document.querySelector(selector);
@@ -81,8 +66,11 @@
       musicPrev: $("#musicPrev"),
       musicNext: $("#musicNext"),
       musicSelect: $("#musicSelect"),
+      musicVolumeDown: $("#musicVolumeDown"),
+      musicVolumeUp: $("#musicVolumeUp"),
+      musicVolumeLabel: $("#musicVolumeLabel"),
       siteMusic: $("#siteMusic"),
-      voiceAudio: $("#voiceAudio"),
+      liveDialog: $("#liveDialog"),
     };
 
     function createLink(item, className) {
@@ -288,10 +276,19 @@
       elements.musicToggle.setAttribute("aria-label", isPlaying ? "暂停音乐" : "播放音乐");
     }
 
+    function updateMusicVolumeLabel() {
+      elements.musicVolumeLabel.textContent = `${Math.round(elements.siteMusic.volume * 100)}%`;
+    }
+
+    function setMusicVolume(volume) {
+      elements.siteMusic.volume = clamp(volume, 0, 1);
+      updateMusicVolumeLabel();
+    }
+
     function playMusic() {
       if (!state.musicReady) {
         setMusicTrack(state.musicIndex);
-        elements.siteMusic.volume = 0.38;
+        setMusicVolume(0.38);
         state.musicReady = true;
       }
 
@@ -336,13 +333,8 @@
       pauseMusic();
     }
 
-    function playVoiceLine() {
-      const source = voiceTracks[state.voiceIndex % voiceTracks.length];
-      state.voiceIndex += 1;
-      elements.voiceAudio.src = source;
-      elements.voiceAudio.volume = 0.62;
-      elements.voiceAudio.currentTime = 0;
-      elements.voiceAudio.play().catch(() => {});
+    function changeMusicVolume(delta) {
+      setMusicVolume(elements.siteMusic.volume + delta);
     }
 
     function clamp(value, min, max) {
@@ -451,6 +443,15 @@
     function handleLiveBackgroundTouch(event) {
       if (!shouldForwardTouch(event)) return;
       forwardLiveBackgroundPointer(event);
+    }
+
+    function handleLiveDialogMessage(event) {
+      if (event.origin !== window.location.origin) return;
+      if (event.data?.source !== "kuailebozi-live-dialog") return;
+
+      const text = String(event.data.text || "").trim();
+      elements.liveDialog.textContent = text;
+      elements.liveDialog.classList.toggle("is-visible", Boolean(event.data.visible && text));
     }
 
     function removeOldMediaWorkers() {
@@ -630,6 +631,8 @@
       elements.musicPrev.addEventListener("click", playPreviousTrack);
       elements.musicNext.addEventListener("click", playNextTrack);
       elements.musicSelect.addEventListener("change", selectMusicTrack);
+      elements.musicVolumeDown.addEventListener("click", () => changeMusicVolume(-0.08));
+      elements.musicVolumeUp.addEventListener("click", () => changeMusicVolume(0.08));
       elements.siteMusic.addEventListener("ended", playNextTrack);
       elements.siteMusic.addEventListener("play", () => updateMusicState(true));
       elements.siteMusic.addEventListener("pause", () => updateMusicState(false));
@@ -661,16 +664,14 @@
       });
 
       document.addEventListener("pointerdown", handleLiveBackgroundTouch, true);
-      document.addEventListener("pointerup", (event) => {
-        if (!shouldForwardTouch(event)) return;
-        playVoiceLine();
-      }, true);
       document.addEventListener("pointermove", handleLiveBackgroundTouch, true);
       document.addEventListener("pointerup", handleLiveBackgroundTouch, true);
+      window.addEventListener("message", handleLiveDialogMessage);
     }
 
     renderContent();
     initMusicOptions();
+    updateMusicVolumeLabel();
     elements.homeLayout.classList.add("is-profile-panel");
     loadProjectData().then(applyInitialRoute);
     bindEvents();

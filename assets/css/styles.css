@@ -16,6 +16,7 @@
   --line: rgba(89, 196, 255, 0.5);
   --line-soft: rgba(141, 226, 255, 0.28);
   --shadow: 0 16px 34px rgba(17, 72, 139, 0.16);
+  --dialog-lane: 56px;
 }
 
 *,
@@ -240,11 +241,41 @@ a {
 
 .dashboard {
   width: min(1240px, 100%);
-  height: calc(100vh - 48px);
+  height: calc(100vh - 48px - var(--dialog-lane));
   margin: 0 auto;
   opacity: 0;
   transform: translateY(18px);
   transition: opacity 560ms ease 160ms, transform 560ms ease 160ms;
+}
+
+.live-dialog {
+  position: fixed;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+  z-index: 14;
+  display: block;
+  max-width: min(700px, calc(100vw - 360px));
+  padding: 8px 18px;
+  border: 2px solid rgba(23, 43, 79, 0.9);
+  border-radius: 999px;
+  color: #1a1d2b;
+  font-size: clamp(0.86rem, 1.4vw, 1rem);
+  font-weight: 800;
+  line-height: 1.35;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 10px 24px rgba(17, 72, 139, 0.18);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate(-50%, 8px);
+  transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
+}
+
+.live-dialog.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
 }
 
 .has-entered .dashboard {
@@ -434,6 +465,14 @@ a {
   align-items: center;
 }
 
+.music-volume {
+  display: grid;
+  grid-template-columns: 26px minmax(42px, 1fr) 26px;
+  gap: 5px;
+  margin-top: 5px;
+  align-items: center;
+}
+
 .music-control,
 .music-select {
   position: relative;
@@ -457,6 +496,20 @@ a {
   min-width: 0;
   padding: 0 6px;
   font-size: 0.72rem;
+}
+
+.music-volume span {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  height: 26px;
+  border: 1px solid rgba(89, 196, 255, 0.28);
+  border-radius: 6px;
+  color: var(--blue-900);
+  font-size: 0.66rem;
+  font-weight: 900;
+  background: rgba(255, 255, 255, 0.52);
 }
 
 .home-layout {
@@ -1022,7 +1075,7 @@ a {
 
   .dashboard {
     height: auto;
-    min-height: calc(100vh - 32px);
+    min-height: calc(100vh - 32px - var(--dialog-lane));
   }
 
   .topbar {
@@ -1139,12 +1192,19 @@ a {
 
   .site-shell {
     min-height: 100svh;
-    padding: max(10px, env(safe-area-inset-top)) 10px max(14px, env(safe-area-inset-bottom));
+    padding: max(10px, env(safe-area-inset-top)) 10px calc(var(--dialog-lane) + max(14px, env(safe-area-inset-bottom)));
   }
 
   .dashboard {
     width: 100%;
-    min-height: calc(100svh - 24px);
+    min-height: calc(100svh - 24px - var(--dialog-lane));
+  }
+
+  .live-dialog {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 74px);
+    max-width: calc(100vw - 24px);
+    padding: 7px 12px;
+    font-size: 0.82rem;
   }
 
   .topbar {
@@ -1219,10 +1279,21 @@ a {
     margin-top: 4px;
   }
 
+  .music-volume {
+    grid-template-columns: 22px minmax(34px, 1fr) 22px;
+    gap: 4px;
+    margin-top: 4px;
+  }
+
   .music-control,
   .music-select {
     height: 22px;
     font-size: 0.68rem;
+  }
+
+  .music-volume span {
+    height: 22px;
+    font-size: 0.6rem;
   }
 
   .home-layout {
