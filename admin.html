@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="KuaileBozi 的项目内容编辑页。" />
+    <title>KuaileBozi</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/media/favicon-32.png?v=icon-2" />
+    <link rel="apple-touch-icon" href="assets/media/apple-touch-icon.png?v=icon-2" />
+    <link rel="stylesheet" href="assets/css/styles.css?v=clean-1" />
+  </head>
+  <body class="has-entered admin-page">
+    <iframe
+      class="live-background"
+      id="liveBackground"
+      src="assets/live-bg/index.html?v=clean-1"
+      title=""
+      tabindex="-1"
+      aria-hidden="true"
+      loading="eager"
+    ></iframe>
+
+    <div class="scene-overlay" aria-hidden="true"></div>
+    <div class="hud-grid" aria-hidden="true"></div>
+    <div class="halo halo-large" aria-hidden="true"></div>
+    <div class="halo halo-small" aria-hidden="true"></div>
+    <div class="custom-cursor" id="customCursor" aria-hidden="true"></div>
+
+    <main class="site-shell detail-shell">
+      <header class="topbar">
+        <a class="brand" href="index.html" aria-label="返回首页">
+          <span class="brand-symbol">K</span>
+          <span>
+            <strong>KuaileBozi</strong>
+            <small>内容编辑</small>
+          </span>
+        </a>
+
+        <nav class="nav-links" aria-label="编辑页操作">
+          <a class="nav-tab" href="index.html">首页</a>
+          <a class="nav-tab is-active" href="admin.html">编辑</a>
+          <a class="nav-tab" id="previewLink" href="project.html?id=diffusion">预览</a>
+        </nav>
+      </header>
+
+      <section class="admin-layout">
+        <article class="hero panel admin-hero">
+          <p class="eyebrow">GitHub Contents API / Owner Edit</p>
+          <h1>项目内容编辑</h1>
+          <p>
+            使用你的 GitHub Token 保存内容到仓库，访客只能查看页面，不能保存修改。
+          </p>
+        </article>
+
+        <article class="panel admin-panel">
+          <form class="admin-form" id="adminForm">
+            <label>
+              GitHub Token
+              <input id="githubToken" type="password" autocomplete="off" placeholder="粘贴 fine-grained token 或 classic token" />
+            </label>
+
+            <div class="admin-row">
+              <label>
+                内容类型
+                <select id="contentMode">
+                  <option value="projects">课题详情</option>
+                  <option value="links">联系与传送门</option>
+                </select>
+              </label>
+              <label id="projectSelectWrap">
+                选择项目
+                <select id="projectSelect"></select>
+              </label>
+              <button class="action-link" id="saveProject" type="submit">保存到 GitHub</button>
+            </div>
+
+            <div class="project-editor" id="projectEditor">
+            <label>
+              标题
+              <input id="projectTitleInput" type="text" />
+            </label>
+
+            <div class="admin-row">
+              <label>
+                类型
+                <input id="projectTypeInput" type="text" />
+              </label>
+              <label>
+                状态
+                <input id="projectStatusInput" type="text" />
+              </label>
+              <label>
+                更新时间
+                <input id="projectUpdatedInput" type="date" />
+              </label>
+            </div>
+
+            <label>
+              简介
+              <textarea id="projectSummaryInput" rows="4"></textarea>
+            </label>
+
+            <label>
+              标签
+              <input id="projectTagsInput" type="text" placeholder="用逗号分隔，例如 Diffusion, AI, Notes" />
+            </label>
+
+            <label>
+              正文区块
+              <textarea id="projectSectionsInput" rows="10" placeholder="每个区块用空行分隔。第一行是小标题，后面是正文。"></textarea>
+            </label>
+
+            <label>
+              链接
+              <textarea id="projectLinksInput" rows="5" placeholder="每行一个链接：标题 | https://example.com"></textarea>
+            </label>
+            </div>
+
+            <div class="links-editor" id="linksEditor" hidden>
+              <label>
+                联系与传送门
+                <textarea id="siteLinksInput" rows="8" placeholder="每行一个链接：标题 | https://example.com"></textarea>
+              </label>
+            </div>
+
+            <p class="admin-status" id="adminStatus">正在读取项目数据。</p>
+          </form>
+        </article>
+      </section>
+    </main>
+
+    <script defer src="assets/js/global-ui.js?v=clean-1"></script>
+    <script defer src="assets/js/admin.js?v=clean-1"></script>
+  </body>
+</html>

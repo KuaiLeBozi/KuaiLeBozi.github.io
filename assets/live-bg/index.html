@@ -4,12 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dynamic Background</title>
-    <link rel="stylesheet" href="./assets/live-background.css?v=dynamic-bg-2" />
+    <link rel="stylesheet" href="./assets/live-background.css?v=clean-1" />
     <style>
       .setting-button,
       .setting,
+      .badialog,
       #loading {
         display: none !important;
+      }
+
+      .badialog {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
       }
     </style>
   </head>
@@ -18,11 +25,20 @@
     <script>
       (() => {
         window.__LIVE_BG_FIT__ = {
-          baseWidth: 2560,
-          baseHeight: 1440,
-          baseX: 1282,
-          baseY: 1433,
-          baseScale: 0.75,
+          desktop: {
+            baseWidth: 2560,
+            baseHeight: 1440,
+            baseX: 1282,
+            baseY: 1433,
+            baseScale: 0.75,
+          },
+          portrait: {
+            xRatio: 0.76,
+            yRatio: 0.86,
+            minScale: 0.38,
+            maxScale: 0.48,
+            scaleDivisor: 1100,
+          },
         };
 
         const originalXHRSend = XMLHttpRequest.prototype.send;
@@ -41,16 +57,30 @@
               const data = JSON.parse(this.responseText);
               const model = data.SettingModel;
               const fit = window.__LIVE_BG_FIT__;
-              const cover = Math.max(window.innerWidth / fit.baseWidth, window.innerHeight / fit.baseHeight);
+              const isPortrait = window.innerWidth <= 700 || window.innerHeight > window.innerWidth * 1.15;
+              const desktopFit = fit.desktop;
+              const cover = Math.max(
+                window.innerWidth / desktopFit.baseWidth,
+                window.innerHeight / desktopFit.baseHeight
+              );
+              const portraitScale = Math.min(
+                fit.portrait.maxScale,
+                Math.max(fit.portrait.minScale, window.innerWidth / fit.portrait.scaleDivisor)
+              );
 
-              model.version = 9004;
+              model.version = 9006;
               model.resolution = "2k";
-              model.x = Math.round(fit.baseX * cover + (window.innerWidth - fit.baseWidth * cover) / 2);
-              model.y = Math.round(fit.baseY * cover + (window.innerHeight - fit.baseHeight * cover) / 2);
-              model.scale = Number((fit.baseScale * cover).toFixed(4));
+              model.x = isPortrait
+                ? Math.round(window.innerWidth * fit.portrait.xRatio)
+                : Math.round(desktopFit.baseX * cover + (window.innerWidth - desktopFit.baseWidth * cover) / 2);
+              model.y = isPortrait
+                ? Math.round(window.innerHeight * fit.portrait.yRatio)
+                : Math.round(desktopFit.baseY * cover + (window.innerHeight - desktopFit.baseHeight * cover) / 2);
+              model.scale = Number((isPortrait ? portraitScale : desktopFit.baseScale * cover).toFixed(4));
               model.bgmVolume = 0;
               model.panelDisplay = false;
               model.showTouch = false;
+              model.showTalkDialog = false;
 
               Object.defineProperty(this, "responseText", { value: JSON.stringify(data) });
               Object.defineProperty(this, "response", { value: JSON.stringify(data) });
@@ -60,6 +90,16 @@
           });
 
           return originalXHRSend.apply(this, args);
+        };
+
+        Storage.prototype.getItem = function (key) {
+          if (key === "CH0295_home.skel") return null;
+          return nativeGetItem.call(this, key);
+        };
+
+        Storage.prototype.setItem = function (key, value) {
+          if (key === "CH0295_home.skel") return;
+          return nativeSetItem.call(this, key, value);
         };
 
         if (srcDescriptor?.set && srcDescriptor?.get) {
@@ -92,15 +132,6 @@
         };
       })();
     </script>
-    <script type="module" src="./assets/live-background.js?v=dynamic-bg-2"></script>
+    <script type="module" src="./assets/live-background.js?v=clean-1"></script>
   </body>
 </html>
-        Storage.prototype.getItem = function (key) {
-          if (key === "CH0295_home.skel") return null;
-          return nativeGetItem.call(this, key);
-        };
-
-        Storage.prototype.setItem = function (key, value) {
-          if (key === "CH0295_home.skel") return;
-          return nativeSetItem.call(this, key, value);
-        };

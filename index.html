@@ -7,16 +7,16 @@
       name="description"
       content="KuaileBozi 的个人主页，蔚蓝档案风格 GitHub Pages 静态站点。"
     />
-    <title>KuaileBozi | 蔚蓝档案风格主页</title>
-    <link rel="icon" type="image/png" href="assets/media/CH0070_Halo.png?v=click-1080-1" />
-    <link rel="apple-touch-icon" href="assets/media/CH0070_Halo.png?v=click-1080-1" />
-    <link rel="stylesheet" href="assets/css/styles.css?v=dynamic-bg-2" />
+    <title>KuaileBozi</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/media/favicon-32.png?v=icon-2" />
+    <link rel="apple-touch-icon" href="assets/media/apple-touch-icon.png?v=icon-2" />
+    <link rel="stylesheet" href="assets/css/styles.css?v=clean-1" />
   </head>
   <body>
     <iframe
       class="live-background"
       id="liveBackground"
-      src="assets/live-bg/index.html?v=dynamic-bg-2"
+      src="assets/live-bg/index.html?v=clean-1"
       title=""
       tabindex="-1"
       aria-hidden="true"
@@ -50,13 +50,29 @@
 
           <nav class="nav-links" aria-label="页面分区">
             <button class="nav-tab is-active" type="button" data-panel="profile">档案</button>
-            <button class="nav-tab" type="button" data-panel="projects">任务</button>
+            <button class="nav-tab" type="button" data-panel="projects">课题</button>
             <button class="nav-tab" type="button" data-panel="links">通讯</button>
           </nav>
         </header>
 
+        <aside class="fixed-player" id="fixedPlayer" aria-label="固定音乐播放器">
+          <button class="music-toggle" id="musicToggle" type="button" aria-label="暂停音乐">
+            <span class="music-icon" aria-hidden="true"></span>
+          </button>
+          <div class="music-meta">
+            <span class="panel-label">Now Playing</span>
+            <strong id="musicTitle">Hello to Halo</strong>
+            <div class="music-controls" aria-label="歌曲切换">
+              <button class="music-control" id="musicPrev" type="button" aria-label="上一首">&lt;</button>
+              <select class="music-select" id="musicSelect" aria-label="选择歌曲"></select>
+              <button class="music-control" id="musicNext" type="button" aria-label="下一首">&gt;</button>
+            </div>
+          </div>
+          <audio id="siteMusic" preload="auto"></audio>
+        </aside>
+
         <section class="home-layout" id="home">
-          <section class="hero panel">
+          <section class="hero panel" id="heroPanel">
             <p class="eyebrow" id="heroEyebrow">Loading terminal...</p>
             <h2 id="heroTitle">欢迎，老师。</h2>
             <p id="heroBio"></p>
@@ -76,12 +92,29 @@
                 <h4 id="nowTitle"></h4>
                 <p id="nowText"></p>
               </div>
+              <section class="comments-section" aria-label="GitHub 评论区">
+                <div class="section-heading">
+                  <span class="panel-label">留言板</span>
+                  <h3>GitHub 评论区</h3>
+                </div>
+                <p class="comments-hint">使用 GitHub 账号留下讯息，内容会记录在这个页面对应的 Issue 里。</p>
+                <div class="github-comments">
+                  <script
+                    src="https://utteranc.es/client.js"
+                    repo="KuaiLeBozi/KuaiLeBozi.github.io"
+                    issue-term="pathname"
+                    theme="boxy-light"
+                    crossorigin="anonymous"
+                    async
+                  ></script>
+                </div>
+              </section>
             </article>
 
             <article class="panel-view" id="panel-projects" data-panel-view="projects">
               <div class="section-heading">
-                <span class="panel-label">任务档案</span>
-                <h3>进行中的课题</h3>
+                <span class="panel-label">研究看板</span>
+                <h3>正在推进的方向</h3>
               </div>
               <div class="project-grid" id="projectGrid"></div>
             </article>
@@ -102,7 +135,8 @@
       <p class="noscript">请启用 JavaScript 以加载动态背景与个人档案内容。</p>
     </noscript>
 
-    <script defer src="assets/js/site-config.js?v=dynamic-bg-2"></script>
-    <script defer src="assets/js/app.js?v=dynamic-bg-2"></script>
+    <script defer src="assets/js/global-ui.js?v=clean-1"></script>
+    <script defer src="assets/js/site-config.js?v=clean-1"></script>
+    <script defer src="assets/js/app.js?v=clean-1"></script>
   </body>
 </html>

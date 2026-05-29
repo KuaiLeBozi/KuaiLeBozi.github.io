@@ -1,6 +1,6 @@
 ﻿{
     "SettingModel":  {
-                         "version":  9004,
+                         "version":  9005,
                          "skel":  "CH0295_home.skel",
                          "atlas":  "CH0295_home.atlas",
                          "eyeTouch":  "Touch_Me",
@@ -13,7 +13,7 @@
                          "talkVolume":  0.45,
                          "showTouch":  false,
                          "panelDisplay":  false,
-                         "showTalkDialog":  true,
+                         "showTalkDialog":  false,
                          "textX":  880,
                          "textY":  495,
                          "textSize":  16,

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="KuaileBozi 的课题详情页。" />
+    <title>KuaileBozi</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/media/favicon-32.png?v=icon-2" />
+    <link rel="apple-touch-icon" href="assets/media/apple-touch-icon.png?v=icon-2" />
+    <link rel="stylesheet" href="assets/css/styles.css?v=clean-1" />
+  </head>
+  <body class="has-entered detail-page">
+    <iframe
+      class="live-background"
+      id="liveBackground"
+      src="assets/live-bg/index.html?v=clean-1"
+      title=""
+      tabindex="-1"
+      aria-hidden="true"
+      loading="eager"
+    ></iframe>
+
+    <div class="scene-overlay" aria-hidden="true"></div>
+    <div class="hud-grid" aria-hidden="true"></div>
+    <div class="halo halo-large" aria-hidden="true"></div>
+    <div class="halo halo-small" aria-hidden="true"></div>
+    <div class="custom-cursor" id="customCursor" aria-hidden="true"></div>
+
+    <main class="site-shell detail-shell">
+      <header class="topbar">
+        <a class="brand" href="index.html" aria-label="返回首页">
+          <span class="brand-symbol">K</span>
+          <span>
+            <strong>KuaileBozi</strong>
+            <small>课题详情</small>
+          </span>
+        </a>
+
+        <nav class="nav-links" aria-label="详情页操作">
+          <a class="nav-tab" href="index.html">首页</a>
+          <a class="nav-tab" href="admin.html">编辑</a>
+          <a class="nav-tab is-active" href="project.html">详情</a>
+        </nav>
+      </header>
+
+      <section class="detail-layout">
+        <article class="hero panel detail-hero">
+          <p class="eyebrow" id="projectType">Loading project...</p>
+          <h1 id="projectTitle">课题详情</h1>
+          <p id="projectSummary">正在读取内容。</p>
+          <div class="hero-actions" id="projectActions"></div>
+        </article>
+
+        <article class="panel detail-content">
+          <div class="project-meta" id="projectMeta"></div>
+          <div class="detail-sections" id="projectSections"></div>
+        </article>
+      </section>
+    </main>
+
+    <script defer src="assets/js/global-ui.js?v=clean-1"></script>
+    <script defer src="assets/js/project-detail.js?v=project-1"></script>
+  </body>
+</html>
