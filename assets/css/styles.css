@@ -404,7 +404,7 @@ a {
 .home-layout {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(310px, 360px);
+  grid-template-columns: minmax(0, 1fr) 230px;
   gap: 22px;
   height: calc(100% - 84px);
   padding-top: 22px;
@@ -611,10 +611,10 @@ a {
   top: 108px;
   right: max(24px, calc((100vw - 1240px) / 2 + 24px));
   z-index: 4;
-  width: min(360px, 30vw);
-  min-width: 310px;
+  width: min(230px, 22vw);
+  min-width: 220px;
   max-height: calc(100vh - 154px);
-  padding: 16px;
+  padding: 10px;
   overflow: hidden;
 }
 
@@ -627,7 +627,7 @@ a {
   display: flex;
   justify-content: space-between;
   gap: 14px;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border-radius: 8px;
   color: white;
   background: linear-gradient(135deg, var(--blue-500), var(--blue-700));
@@ -636,100 +636,24 @@ a {
 
 .drag-handle span,
 .drag-handle strong {
-  font-size: 0.78rem;
+  font-size: 0.68rem;
   font-weight: 900;
 }
 
-.character-halo {
-  position: absolute;
-  left: 50%;
-  top: 78px;
-  width: 154px;
-  height: 44px;
-  transform: translateX(-50%);
-  border: 4px solid rgba(39, 168, 255, 0.46);
-  border-radius: 50%;
-  box-shadow: 0 0 28px rgba(39, 168, 255, 0.28);
-}
-
 .character-model {
-  position: relative;
-  height: 330px;
-  margin-top: 14px;
-}
-
-.model-head {
-  position: absolute;
-  left: 50%;
-  top: 74px;
-  width: 94px;
-  height: 104px;
-  transform: translateX(-50%);
-  border-radius: 46% 46% 48% 48%;
-  background: #fff1df;
-  box-shadow: inset 0 -12px 0 rgba(246, 210, 181, 0.4);
-}
-
-.model-head::before,
-.model-head::after {
-  content: "";
-  position: absolute;
-  top: 48px;
-  width: 10px;
-  height: 15px;
-  border-radius: 50%;
-  background: var(--blue-900);
-}
-
-.model-head::before {
-  left: 28px;
-}
-
-.model-head::after {
-  right: 28px;
-}
-
-.model-hair {
-  position: absolute;
-  left: 50%;
-  top: 42px;
-  width: 142px;
-  height: 148px;
-  transform: translateX(-50%);
-  border-radius: 48% 48% 40% 40%;
-  background: linear-gradient(160deg, #dff7ff, #7ac9ff 58%, #3582d9);
-  clip-path: polygon(12% 20%, 30% 0, 49% 16%, 68% 0, 88% 22%, 86% 92%, 62% 100%, 48% 78%, 33% 100%, 12% 88%);
-}
-
-.model-body {
-  position: absolute;
-  left: 50%;
-  top: 178px;
-  width: 154px;
-  height: 138px;
-  transform: translateX(-50%);
-  border-radius: 36px 36px 18px 18px;
-  background:
-    linear-gradient(90deg, transparent 0 24%, rgba(255, 255, 255, 0.72) 24% 30%, transparent 30%),
-    linear-gradient(135deg, #ffffff, #bcecff 48%, #4ea7eb);
-  box-shadow: 0 16px 30px rgba(18, 121, 220, 0.22);
-}
-
-.model-ribbon {
-  position: absolute;
-  left: 50%;
-  top: 194px;
-  width: 66px;
-  height: 34px;
-  transform: translateX(-50%);
-  background: var(--yellow);
-  clip-path: polygon(0 0, 45% 38%, 0 100%, 50% 68%, 100% 100%, 55% 38%, 100% 0, 50% 28%);
+  display: block;
+  width: 100%;
+  height: 180px;
+  margin-top: 10px;
+  border-radius: 8px;
+  object-fit: contain;
+  background: rgba(255, 255, 255, 0.28);
 }
 
 .student-card {
   position: relative;
-  margin-top: -16px;
-  padding: 14px;
+  margin-top: 8px;
+  padding: 10px;
   border-radius: 8px;
   text-align: center;
   background: rgba(255, 255, 255, 0.64);
@@ -737,28 +661,34 @@ a {
 
 .student-card-tag {
   display: inline-flex;
-  padding: 5px 9px;
+  padding: 4px 8px;
   border-radius: 6px;
   color: white;
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   font-weight: 900;
   background: var(--blue-700);
 }
 
 .student-card h3 {
-  margin: 10px 0 4px;
+  margin: 8px 0 4px;
   color: var(--blue-900);
-  font-size: 1.35rem;
+  font-size: 1.05rem;
+}
+
+.student-card p {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
 }
 
 .status-panel {
   display: grid;
-  gap: 10px;
-  margin-top: 12px;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .status-panel div {
-  padding: 12px;
+  padding: 9px;
   border-radius: 8px;
   background: linear-gradient(90deg, rgba(255, 255, 255, 0.86), rgba(234, 249, 255, 0.62));
 }
@@ -767,34 +697,7 @@ a {
   display: block;
   margin-top: 3px;
   color: var(--blue-900);
-}
-
-.audio-unlock {
-  position: fixed;
-  right: 22px;
-  bottom: 90px;
-  z-index: 6;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(10px);
-  transition: opacity 220ms ease, transform 220ms ease, visibility 220ms ease;
-}
-
-.audio-unlock.is-visible {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-
-.audio-unlock button {
-  min-height: 42px;
-  padding: 10px 16px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  color: white;
-  font-weight: 900;
-  background: linear-gradient(135deg, var(--blue-500), var(--blue-700));
-  box-shadow: var(--shadow);
+  font-size: 0.92rem;
 }
 
 .player {
@@ -938,7 +841,6 @@ a {
     gap: 3px;
   }
 
-  .audio-unlock,
   .player {
     right: 12px;
   }

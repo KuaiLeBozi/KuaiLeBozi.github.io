@@ -4,6 +4,7 @@
     entered: false,
     trackIndex: 0,
     muted: false,
+    lobbySwitched: false,
     dragging: false,
     dragOffset: { x: 0, y: 0 },
     audio: new Audio(),
@@ -13,10 +14,9 @@
   const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
   const elements = {
+    memoryLobby: $("#memoryLobby"),
     entryGate: $("#entryGate"),
     player: $("#player"),
-    audioUnlock: $("#audioUnlock"),
-    audioUnlockButton: $("#audioUnlockButton"),
     playPauseButton: $("#playPauseButton"),
     nextButton: $("#nextButton"),
     muteButton: $("#muteButton"),
@@ -143,11 +143,10 @@
     return state.audio
       .play()
       .then(() => {
-        elements.audioUnlock.classList.remove("is-visible");
         updateTrackUi();
       })
       .catch(() => {
-        elements.audioUnlock.classList.add("is-visible");
+        // Browsers may block audible autoplay. Keep the player visible so the next click can resume.
         updateTrackUi();
       });
   }
@@ -232,7 +231,6 @@
   }
 
   function bindEvents() {
-    elements.audioUnlockButton.addEventListener("click", playAudio);
     elements.playPauseButton.addEventListener("click", togglePlay);
     elements.nextButton.addEventListener("click", nextTrack);
     elements.muteButton.addEventListener("click", toggleMute);
@@ -262,6 +260,14 @@
     elements.dragHandle.addEventListener("touchstart", startDrag, { passive: true });
     document.addEventListener("touchmove", moveDrag, { passive: true });
     document.addEventListener("touchend", endDrag);
+
+    elements.memoryLobby.addEventListener("ended", () => {
+      if (state.lobbySwitched) return;
+      state.lobbySwitched = true;
+      elements.memoryLobby.src = "assets/media/CH0295_home_Idle_01.webm";
+      elements.memoryLobby.loop = true;
+      elements.memoryLobby.play().catch(() => {});
+    });
   }
 
   renderContent();
