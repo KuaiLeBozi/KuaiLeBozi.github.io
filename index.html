@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="KuaiLeBozi personal homepage, Blue Archive inspired static GitHub Pages site."
+      content="KuaiLeBozi 的个人主页，蔚蓝档案风格 GitHub Pages 静态站点。"
     />
-    <title>KuaiLeBozi | Blue Archive Style Home</title>
+    <title>KuaiLeBozi | 蔚蓝档案风格主页</title>
     <link rel="stylesheet" href="assets/css/styles.css" />
   </head>
   <body>
@@ -24,70 +24,86 @@
 
     <div class="scene-overlay" aria-hidden="true"></div>
     <div class="hud-grid" aria-hidden="true"></div>
+    <div class="halo halo-large" aria-hidden="true"></div>
+    <div class="halo halo-small" aria-hidden="true"></div>
 
     <main class="site-shell" id="app">
       <section class="entry-gate" id="entryGate" aria-labelledby="entryTitle">
+        <div class="entry-card" aria-hidden="true">
+          <span>联邦搜查部 Schale</span>
+          <strong>访问认证中</strong>
+        </div>
         <div class="entry-mark">
-          <span class="entry-kicker">Schale Personal Terminal</span>
+          <span class="entry-kicker">Kivotos Personal Terminal</span>
           <h1 id="entryTitle">KuaiLeBozi</h1>
-          <p>Blue Archive inspired homepage</p>
+          <p>欢迎来到我的夏日记忆大厅</p>
         </div>
         <button class="enter-button" id="enterButton" type="button">
-          <span>Enter</span>
+          <span>TOUCH TO START</span>
+          <small>进入基沃托斯</small>
         </button>
       </section>
 
-      <section class="dashboard" id="dashboard" aria-label="Personal homepage">
+      <section class="dashboard" id="dashboard" aria-label="个人主页">
         <header class="topbar">
-          <a class="brand" href="#home" aria-label="Back to home">
+          <a class="brand" href="#home" aria-label="返回首页">
             <span class="brand-symbol">K</span>
             <span>
               <strong>KuaiLeBozi</strong>
-              <small>GitHub Pages</small>
+              <small>夏日值日记录</small>
             </span>
           </a>
 
-          <nav class="nav-links" aria-label="Page sections">
-            <a href="#profile">Profile</a>
-            <a href="#projects">Projects</a>
-            <a href="#links">Links</a>
+          <nav class="nav-links" aria-label="页面分区">
+            <a href="#profile">档案</a>
+            <a href="#projects">任务</a>
+            <a href="#links">通讯</a>
           </nav>
         </header>
 
         <section class="hero" id="home">
           <div class="hero-copy panel">
             <p class="eyebrow" id="heroEyebrow">Loading terminal...</p>
-            <h2 id="heroTitle">Welcome</h2>
+            <h2 id="heroTitle">欢迎，老师。</h2>
             <p id="heroBio"></p>
             <div class="hero-actions" id="heroActions"></div>
           </div>
 
-          <aside class="status-panel panel" aria-label="Status">
+          <aside class="student-card panel" aria-label="学院档案">
+            <span class="student-card-tag">Student ID</span>
+            <div class="student-avatar">
+              <span>K</span>
+            </div>
+            <h3>KuaiLeBozi</h3>
+            <p>Schale 访问者 / GitHub Pages</p>
+          </aside>
+
+          <aside class="status-panel panel" aria-label="状态">
             <div>
               <span class="panel-label">Current BGM</span>
               <strong id="statusTrack">Hello to Halo</strong>
             </div>
             <div>
-              <span class="panel-label">Mode</span>
-              <strong>Memory Lobby</strong>
+              <span class="panel-label">Session</span>
+              <strong>夏日记忆大厅</strong>
             </div>
             <div>
-              <span class="panel-label">Build</span>
-              <strong>Static Pages</strong>
+              <span class="panel-label">School</span>
+              <strong>Schale</strong>
             </div>
           </aside>
         </section>
 
         <section class="content-grid" id="profile">
           <article class="profile-card panel">
-            <span class="panel-label">Profile</span>
+            <span class="panel-label">档案</span>
             <h3 id="profileName"></h3>
             <p id="profileText"></p>
             <dl class="fact-list" id="factList"></dl>
           </article>
 
           <article class="profile-card panel">
-            <span class="panel-label">Now</span>
+            <span class="panel-label">今日值日</span>
             <h3 id="nowTitle"></h3>
             <p id="nowText"></p>
           </article>
@@ -95,16 +111,16 @@
 
         <section class="projects" id="projects" aria-labelledby="projectsTitle">
           <div class="section-heading">
-            <span class="panel-label">Archive</span>
-            <h3 id="projectsTitle">Projects</h3>
+            <span class="panel-label">任务档案</span>
+            <h3 id="projectsTitle">进行中的课题</h3>
           </div>
           <div class="project-grid" id="projectGrid"></div>
         </section>
 
         <section class="links panel" id="links" aria-labelledby="linksTitle">
           <div>
-            <span class="panel-label">Contact</span>
-            <h3 id="linksTitle">Find me here</h3>
+            <span class="panel-label">通讯频道</span>
+            <h3 id="linksTitle">联系与传送门</h3>
           </div>
           <div class="link-list" id="linkList"></div>
         </section>
@@ -122,13 +138,13 @@
         <span aria-hidden="true">M</span>
       </button>
       <div class="track-meta">
-        <span>Now Playing</span>
+        <span>正在播放</span>
         <strong id="trackTitle">Hello to Halo</strong>
       </div>
     </div>
 
     <noscript>
-      <p class="noscript">Please enable JavaScript to use the music controls and profile content.</p>
+      <p class="noscript">请启用 JavaScript 以加载音乐控制与个人档案内容。</p>
     </noscript>
 
     <script src="assets/js/site-config.js"></script>

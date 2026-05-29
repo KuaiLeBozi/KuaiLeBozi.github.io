@@ -1,45 +1,45 @@
 window.SITE_CONFIG = {
   profile: {
-    eyebrow: "Schale Personal Page",
-    title: "Hi, I am KuaiLeBozi.",
+    eyebrow: "联邦搜查部 Schale / 个人档案",
+    title: "欢迎，老师。",
     bio:
-      "A personal homepage for projects, notes, and small experiments, wrapped in a clean Blue Archive inspired interface.",
+      "这里是 KuaiLeBozi 的个人主页，用来收纳项目、笔记和一些正在进行的小实验。",
     name: "KuaiLeBozi",
     about:
-      "This page is ready for your real introduction. Replace this text with who you are, what you build, and where people can find your work.",
-    nowTitle: "Currently tuning the terminal",
+      "这个档案页会继续更新。之后可以把这里替换成更正式的自我介绍、研究方向、常用技术栈，以及希望别人优先看到的作品。",
+    nowTitle: "正在调整终端界面",
     now:
-      "Static GitHub Pages, local media playback, and a soft memory-lobby atmosphere. The content is intentionally easy to edit in this config file.",
+      "当前版本使用 GitHub Pages 静态部署，背景与音乐均为本地资源，入口交互会在点击后解锁音乐播放。",
     facts: [
       ["Site", "KuaiLeBozi.github.io"],
-      ["Style", "Blue Archive inspired"],
+      ["Style", "蔚蓝档案风格"],
       ["Stack", "HTML, CSS, JavaScript"],
     ],
   },
   actions: [
-    { label: "GitHub", href: "https://github.com/KuaiLeBozi" },
-    { label: "Projects", href: "#projects" },
+    { label: "GitHub 档案", href: "https://github.com/KuaiLeBozi" },
+    { label: "查看任务", href: "#projects" },
   ],
   projects: [
     {
-      title: "Personal Lab",
-      type: "Homepage",
+      title: "个人实验室",
+      type: "主页",
       description:
-        "A small landing point for experiments, project notes, and links worth keeping close.",
+        "用于整理项目、笔记和灵感入口的小型个人主页。",
       href: "https://github.com/KuaiLeBozi",
     },
     {
-      title: "Archive Notes",
-      type: "Writing",
+      title: "档案笔记",
+      type: "记录",
       description:
-        "Reserve this card for essays, study notes, dev logs, or anything that deserves a quieter shelf.",
+        "预留给文章、学习记录、开发日志，或者任何值得保存的内容。",
       href: "#links",
     },
     {
-      title: "Future Build",
-      type: "Project",
+      title: "下一项课题",
+      type: "开发",
       description:
-        "Swap this placeholder with a repository, demo, game, model, or tool when it is ready.",
+        "之后可以替换成真实仓库、在线演示、模型、游戏或工具。",
       href: "#profile",
     },
   ],
