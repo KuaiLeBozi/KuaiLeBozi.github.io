@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dynamic Background</title>
-    <link rel="stylesheet" href="./assets/live-background.css?v=dynamic-bg-1" />
+    <link rel="stylesheet" href="./assets/live-background.css?v=dynamic-bg-2" />
     <style>
       .setting-button,
       .setting,
@@ -17,10 +17,50 @@
     <div id="app"></div>
     <script>
       (() => {
+        window.__LIVE_BG_FIT__ = {
+          baseWidth: 2560,
+          baseHeight: 1440,
+          baseX: 1282,
+          baseY: 1433,
+          baseScale: 0.75,
+        };
+
+        const originalXHRSend = XMLHttpRequest.prototype.send;
+        const nativeGetItem = Storage.prototype.getItem;
+        const nativeSetItem = Storage.prototype.setItem;
         const blockedAudio = /(?:^|\/)Bgm\.wav(?:$|[?#])/i;
         const srcDescriptor = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, "src");
         const nativePlay = HTMLMediaElement.prototype.play;
         const nativePause = HTMLMediaElement.prototype.pause;
+
+        XMLHttpRequest.prototype.send = function (...args) {
+          this.addEventListener("load", () => {
+            if (!/loadJson\.json(?:$|[?#])/i.test(this.responseURL || "")) return;
+
+            try {
+              const data = JSON.parse(this.responseText);
+              const model = data.SettingModel;
+              const fit = window.__LIVE_BG_FIT__;
+              const cover = Math.max(window.innerWidth / fit.baseWidth, window.innerHeight / fit.baseHeight);
+
+              model.version = 9004;
+              model.resolution = "2k";
+              model.x = Math.round(fit.baseX * cover + (window.innerWidth - fit.baseWidth * cover) / 2);
+              model.y = Math.round(fit.baseY * cover + (window.innerHeight - fit.baseHeight * cover) / 2);
+              model.scale = Number((fit.baseScale * cover).toFixed(4));
+              model.bgmVolume = 0;
+              model.panelDisplay = false;
+              model.showTouch = false;
+
+              Object.defineProperty(this, "responseText", { value: JSON.stringify(data) });
+              Object.defineProperty(this, "response", { value: JSON.stringify(data) });
+            } catch {
+              // Keep the packaged background running even if a browser disallows response rewriting.
+            }
+          });
+
+          return originalXHRSend.apply(this, args);
+        };
 
         if (srcDescriptor?.set && srcDescriptor?.get) {
           Object.defineProperty(HTMLMediaElement.prototype, "src", {
@@ -52,6 +92,15 @@
         };
       })();
     </script>
-    <script type="module" src="./assets/live-background.js?v=dynamic-bg-1"></script>
+    <script type="module" src="./assets/live-background.js?v=dynamic-bg-2"></script>
   </body>
 </html>
+        Storage.prototype.getItem = function (key) {
+          if (key === "CH0295_home.skel") return null;
+          return nativeGetItem.call(this, key);
+        };
+
+        Storage.prototype.setItem = function (key, value) {
+          if (key === "CH0295_home.skel") return;
+          return nativeSetItem.call(this, key, value);
+        };

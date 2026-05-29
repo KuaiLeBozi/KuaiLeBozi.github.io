@@ -3,21 +3,21 @@ window.SITE_CONFIG = {
     eyebrow: "联邦搜查部 Schale / 个人档案",
     title: "欢迎，老师。",
     bio:
-      "这里是 KuaiLeBozi 的个人主页，用来收纳项目、笔记和一些正在进行的小实验。",
-    name: "KuaiLeBozi",
+      "这里是 KuaileBozi 的个人主页，用来收纳项目、笔记和一些正在进行的小实验。",
+    name: "KuaileBozi",
     about:
       "这个档案页会继续更新。之后可以把这里替换成更正式的自我介绍、研究方向、常用技术栈，以及希望别人优先看到的作品。",
     nowTitle: "正在调整终端界面",
     now:
-      "当前版本使用 GitHub Pages 静态部署，背景为本地 4K 动态资源，保留触摸语音并移除背景音乐与菜单设置。",
+      "当前版本使用 GitHub Pages 静态部署，背景为本地 2K 动态资源，保留触摸语音并移除背景音乐与菜单设置。",
     facts: [
-      ["Site", "KuaiLeBozi.github.io"],
+      ["Site", "KuaileBozi.github.io"],
       ["Style", "蔚蓝档案风格"],
       ["Stack", "HTML, CSS, JavaScript"],
     ],
   },
   actions: [
-    { label: "GitHub 档案", href: "https://github.com/KuaiLeBozi" },
+    { label: "GitHub 档案", href: "https://github.com/KuaileBozi" },
     { label: "查看任务", panel: "projects" },
   ],
   projects: [
@@ -26,7 +26,7 @@ window.SITE_CONFIG = {
       type: "主页",
       description:
         "用于整理项目、笔记和灵感入口的小型个人主页。",
-      href: "https://github.com/KuaiLeBozi",
+      href: "https://github.com/KuaileBozi",
     },
     {
       title: "档案笔记",
@@ -44,8 +44,8 @@ window.SITE_CONFIG = {
     },
   ],
   links: [
-    { label: "GitHub", href: "https://github.com/KuaiLeBozi" },
-    { label: "Homepage", href: "https://KuaiLeBozi.github.io/" },
+    { label: "GitHub", href: "https://github.com/KuaileBozi" },
+    { label: "Homepage", href: "https://KuaileBozi.github.io/" },
     { label: "Email", href: "mailto:hello@example.com" },
   ],
 };
