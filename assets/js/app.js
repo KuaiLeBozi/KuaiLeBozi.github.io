@@ -10,6 +10,10 @@
     trackIndex: 0,
     muted: false,
     lobbySwitched: false,
+    activeLobbyVideo: null,
+    canvasRaf: 0,
+    canvasWidth: 0,
+    canvasHeight: 0,
     lobbyVideoUrls: {},
     mediaCacheReady: Promise.resolve(),
     audio: new Audio(),
@@ -27,6 +31,7 @@
   const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
   const elements = {
+    memoryCanvas: $("#memoryCanvas"),
     memoryLobby: $("#memoryLobby"),
     memoryLobbyIdle: $("#memoryLobbyIdle"),
     entryGate: $("#entryGate"),
@@ -375,6 +380,65 @@
     }
   }
 
+  function resizeMemoryCanvas() {
+    const canvas = elements.memoryCanvas;
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+    const width = Math.max(1, Math.round(window.innerWidth * pixelRatio));
+    const height = Math.max(1, Math.round(window.innerHeight * pixelRatio));
+
+    if (state.canvasWidth === width && state.canvasHeight === height) {
+      return;
+    }
+
+    state.canvasWidth = width;
+    state.canvasHeight = height;
+    canvas.width = width;
+    canvas.height = height;
+  }
+
+  function drawCoverFrame(context, video) {
+    if (!video || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+      return;
+    }
+
+    const sourceWidth = video.videoWidth;
+    const sourceHeight = video.videoHeight;
+    if (!sourceWidth || !sourceHeight) {
+      return;
+    }
+
+    const targetWidth = elements.memoryCanvas.width;
+    const targetHeight = elements.memoryCanvas.height;
+    const scale = Math.max(targetWidth / sourceWidth, targetHeight / sourceHeight);
+    const width = sourceWidth * scale;
+    const height = sourceHeight * scale;
+    const x = (targetWidth - width) / 2;
+    const y = (targetHeight - height) / 2;
+
+    context.clearRect(0, 0, targetWidth, targetHeight);
+    context.drawImage(video, x, y, width, height);
+  }
+
+  function startCanvasRenderer() {
+    const context = elements.memoryCanvas.getContext("2d", { alpha: false });
+    if (!context) {
+      return;
+    }
+
+    const render = () => {
+      resizeMemoryCanvas();
+      drawCoverFrame(context, state.activeLobbyVideo);
+      state.canvasRaf = window.requestAnimationFrame(render);
+    };
+
+    window.cancelAnimationFrame(state.canvasRaf);
+    render();
+  }
+
+  function setActiveLobbyVideo(video) {
+    state.activeLobbyVideo = video;
+  }
+
   function registerVideoServiceWorker() {
     if (!("serviceWorker" in navigator)) {
       return Promise.resolve();
@@ -416,6 +480,8 @@
         waitForVideoReady(elements.memoryLobby),
         waitForVideoReady(elements.memoryLobbyIdle),
       ]);
+      setActiveLobbyVideo(elements.memoryLobby);
+      startCanvasRenderer();
       await elements.memoryLobby.play().catch(() => {});
       finish();
     } catch (_) {
@@ -423,6 +489,8 @@
       elements.memoryLobbyIdle.src = backgroundVideos[1];
       elements.memoryLobby.load();
       elements.memoryLobbyIdle.load();
+      setActiveLobbyVideo(elements.memoryLobby);
+      startCanvasRenderer();
       elements.memoryLobby.play().catch(() => {});
       finish();
     }
@@ -483,14 +551,14 @@
     });
 
     document.addEventListener("pointermove", updateCursor);
+    window.addEventListener("resize", resizeMemoryCanvas);
 
     elements.memoryLobby.addEventListener("ended", () => {
       if (state.lobbySwitched) return;
       state.lobbySwitched = true;
       elements.memoryLobby.pause();
       seekToStart(elements.memoryLobbyIdle);
-      elements.memoryLobby.classList.remove("is-visible");
-      elements.memoryLobbyIdle.classList.add("is-visible");
+      setActiveLobbyVideo(elements.memoryLobbyIdle);
       elements.memoryLobbyIdle.play().catch(() => {});
     });
   }

@@ -10,11 +10,12 @@
     <title>KuaiLeBozi | 蔚蓝档案风格主页</title>
     <link rel="icon" type="image/png" href="assets/media/CH0070_Halo.png?v=click-1080-1" />
     <link rel="apple-touch-icon" href="assets/media/CH0070_Halo.png?v=click-1080-1" />
-    <link rel="stylesheet" href="assets/css/styles.css?v=media-sw-1" />
+    <link rel="stylesheet" href="assets/css/styles.css?v=canvas-media-1" />
   </head>
   <body>
+    <canvas class="memory-canvas" id="memoryCanvas" aria-hidden="true"></canvas>
     <video
-      class="memory-lobby is-visible"
+      class="memory-lobby"
       id="memoryLobby"
       autoplay
       muted
@@ -139,6 +140,6 @@
     </noscript>
 
     <script defer src="assets/js/site-config.js?v=click-1080-1"></script>
-    <script defer src="assets/js/app.js?v=media-sw-1"></script>
+    <script defer src="assets/js/app.js?v=canvas-media-1"></script>
   </body>
 </html>
