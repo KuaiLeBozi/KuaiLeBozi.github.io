@@ -17,6 +17,7 @@
   --line-soft: rgba(141, 226, 255, 0.28);
   --shadow: 0 16px 34px rgba(17, 72, 139, 0.16);
   --dialog-lane: 56px;
+  --mobile-player-clearance: 210px;
 }
 
 *,
@@ -1192,7 +1193,10 @@ a {
 
   .site-shell {
     min-height: 100svh;
-    padding: max(10px, env(safe-area-inset-top)) 10px calc(var(--dialog-lane) + max(14px, env(safe-area-inset-bottom)));
+    padding:
+      max(10px, env(safe-area-inset-top))
+      10px
+      calc(var(--mobile-player-clearance) + max(18px, env(safe-area-inset-bottom)));
   }
 
   .dashboard {
@@ -1307,7 +1311,7 @@ a {
   .hero,
   .panel-view {
     padding: 16px;
-    padding-bottom: 104px;
+    padding-bottom: var(--mobile-player-clearance);
   }
 
   .hero {
@@ -1443,6 +1447,7 @@ a {
   .hero,
   .panel-view {
     padding: 14px;
+    padding-bottom: var(--mobile-player-clearance);
   }
 
   .hero h2 {
