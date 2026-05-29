@@ -1,12 +1,15 @@
 (function () {
+  function boot() {
   const config = window.SITE_CONFIG;
+  if (!config) {
+    window.setTimeout(boot, 50);
+    return;
+  }
   const state = {
     entered: false,
     trackIndex: 0,
     muted: false,
     lobbySwitched: false,
-    dragging: false,
-    dragOffset: { x: 0, y: 0 },
     audio: new Audio(),
   };
 
@@ -26,6 +29,8 @@
     heroTitle: $("#heroTitle"),
     heroBio: $("#heroBio"),
     heroActions: $("#heroActions"),
+    loadingProgress: $("#loadingProgress"),
+    loadingLabel: $("#loadingLabel"),
     profileName: $("#profileName"),
     profileText: $("#profileText"),
     factList: $("#factList"),
@@ -35,8 +40,6 @@
     linkList: $("#linkList"),
     navTabs: $$(".nav-tab"),
     panelViews: $$(".panel-view"),
-    characterDock: $("#characterDock"),
-    dragHandle: $("#dragHandle"),
     customCursor: $("#customCursor"),
   };
 
@@ -117,7 +120,9 @@
   function updateTrackUi() {
     const track = currentTrack();
     elements.trackTitle.textContent = track.title;
-    elements.statusTrack.textContent = track.title;
+    if (elements.statusTrack) {
+      elements.statusTrack.textContent = track.title;
+    }
     elements.playPauseButton.setAttribute(
       "aria-label",
       state.audio.paused ? "Play music" : "Pause music"
@@ -160,6 +165,67 @@
     loadTrack(0, true);
   }
 
+  function getLobbyBufferedRatio() {
+    const video = elements.memoryLobby;
+    if (!video.duration || !Number.isFinite(video.duration) || video.duration <= 0) {
+      return video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA ? 0.35 : 0;
+    }
+    if (!video.buffered.length) return 0;
+    const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+    return Math.min(bufferedEnd / video.duration, 1);
+  }
+
+  function updateLoadingProgress(ratio) {
+    const progress = Math.max(0, Math.min(ratio, 1));
+    elements.loadingProgress.style.transform = `scaleX(${progress})`;
+    elements.loadingLabel.textContent = `Loading ${Math.round(progress * 100)}%`;
+  }
+
+  function enterWhenLobbyReady() {
+    let visualProgress = 0;
+    updateLoadingProgress(0);
+
+    const timer = window.setInterval(() => {
+      const buffered = getLobbyBufferedRatio();
+      visualProgress = Math.max(visualProgress + 0.012, buffered * 0.92);
+      updateLoadingProgress(Math.min(visualProgress, 0.98));
+      if (isLobbyInitialized()) {
+        finish();
+      }
+    }, 80);
+
+    const finish = () => {
+      if (state.entered) return;
+      window.clearInterval(timer);
+      updateLoadingProgress(1);
+      window.setTimeout(autoEnterSite, 280);
+    };
+
+    function isLobbyInitialized() {
+      return (
+        elements.memoryLobby.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA ||
+        getLobbyBufferedRatio() >= 0.88
+      );
+    }
+
+    if (isLobbyInitialized()) {
+      window.setTimeout(finish, 250);
+      return;
+    }
+
+    const fallback = window.setTimeout(finish, 9000);
+    elements.memoryLobby.addEventListener(
+      "canplaythrough",
+      () => {
+        window.clearTimeout(fallback);
+        window.setTimeout(finish, 250);
+      },
+      { once: true }
+    );
+    elements.memoryLobby.load();
+    elements.memoryLobby.play().catch(() => {});
+  }
+
   function togglePlay() {
     if (state.audio.paused) {
       playAudio();
@@ -193,43 +259,6 @@
     elements.customCursor.style.transform = `translate(${event.clientX}px, ${event.clientY}px)`;
   }
 
-  function clamp(value, min, max) {
-    return Math.min(Math.max(value, min), max);
-  }
-
-  function getPoint(event) {
-    return event.touches ? event.touches[0] : event;
-  }
-
-  function startDrag(event) {
-    if (window.innerWidth < 900) return;
-    const point = getPoint(event);
-    const rect = elements.characterDock.getBoundingClientRect();
-    state.dragging = true;
-    state.dragOffset.x = point.clientX - rect.left;
-    state.dragOffset.y = point.clientY - rect.top;
-    elements.characterDock.classList.add("is-dragging");
-    document.body.classList.add("is-dragging-model");
-  }
-
-  function moveDrag(event) {
-    if (!state.dragging) return;
-    const point = getPoint(event);
-    const width = elements.characterDock.offsetWidth;
-    const height = elements.characterDock.offsetHeight;
-    const left = clamp(point.clientX - state.dragOffset.x, 12, window.innerWidth - width - 12);
-    const top = clamp(point.clientY - state.dragOffset.y, 88, window.innerHeight - height - 12);
-    elements.characterDock.style.left = `${left}px`;
-    elements.characterDock.style.top = `${top}px`;
-    elements.characterDock.style.right = "auto";
-  }
-
-  function endDrag() {
-    state.dragging = false;
-    elements.characterDock.classList.remove("is-dragging");
-    document.body.classList.remove("is-dragging-model");
-  }
-
   function bindEvents() {
     elements.playPauseButton.addEventListener("click", togglePlay);
     elements.nextButton.addEventListener("click", nextTrack);
@@ -251,15 +280,6 @@
     });
 
     document.addEventListener("pointermove", updateCursor);
-    elements.dragHandle.addEventListener("pointerdown", startDrag);
-    document.addEventListener("pointermove", moveDrag);
-    document.addEventListener("pointerup", endDrag);
-    elements.dragHandle.addEventListener("mousedown", startDrag);
-    document.addEventListener("mousemove", moveDrag);
-    document.addEventListener("mouseup", endDrag);
-    elements.dragHandle.addEventListener("touchstart", startDrag, { passive: true });
-    document.addEventListener("touchmove", moveDrag, { passive: true });
-    document.addEventListener("touchend", endDrag);
 
     elements.memoryLobby.addEventListener("ended", () => {
       if (state.lobbySwitched) return;
@@ -273,5 +293,12 @@
   renderContent();
   loadTrack(0, false);
   bindEvents();
-  window.setTimeout(autoEnterSite, 1450);
+  enterWhenLobbyReady();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot, { once: true });
+  } else {
+    boot();
+  }
 })();
