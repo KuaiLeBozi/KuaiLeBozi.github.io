@@ -9,7 +9,7 @@ window.SITE_CONFIG = {
       "这个档案页会继续更新。之后可以把这里替换成更正式的自我介绍、研究方向、常用技术栈，以及希望别人优先看到的作品。",
     nowTitle: "正在调整终端界面",
     now:
-      "当前版本使用 GitHub Pages 静态部署，背景与音乐均为本地资源，入口交互会在点击后解锁音乐播放。",
+      "当前版本使用 GitHub Pages 静态部署，背景为本地 4K 动态资源，保留触摸语音并移除背景音乐与菜单设置。",
     facts: [
       ["Site", "KuaiLeBozi.github.io"],
       ["Style", "蔚蓝档案风格"],
@@ -47,15 +47,5 @@ window.SITE_CONFIG = {
     { label: "GitHub", href: "https://github.com/KuaiLeBozi" },
     { label: "Homepage", href: "https://KuaiLeBozi.github.io/" },
     { label: "Email", href: "mailto:hello@example.com" },
-  ],
-  playlist: [
-    {
-      title: "Hello to Halo",
-      src: "assets/media/Hello to Halo.ogg",
-    },
-    {
-      title: "Constant Moderato",
-      src: "assets/media/Constant Moderato.ogg",
-    },
   ],
 };

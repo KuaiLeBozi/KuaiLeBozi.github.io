@@ -10,18 +10,18 @@
     <title>KuaiLeBozi | 蔚蓝档案风格主页</title>
     <link rel="icon" type="image/png" href="assets/media/CH0070_Halo.png?v=click-1080-1" />
     <link rel="apple-touch-icon" href="assets/media/CH0070_Halo.png?v=click-1080-1" />
-    <link rel="stylesheet" href="assets/css/styles.css?v=single-video-1" />
+    <link rel="stylesheet" href="assets/css/styles.css?v=dynamic-bg-1" />
   </head>
   <body>
-    <video
-      class="memory-lobby is-visible"
-      id="memoryLobby"
-      autoplay
-      muted
-      playsinline
-      preload="auto"
+    <iframe
+      class="live-background"
+      id="liveBackground"
+      src="assets/live-bg/index.html?v=dynamic-bg-1"
+      title=""
+      tabindex="-1"
       aria-hidden="true"
-    ></video>
+      loading="eager"
+    ></iframe>
 
     <div class="scene-overlay" aria-hidden="true"></div>
     <div class="hud-grid" aria-hidden="true"></div>
@@ -30,22 +30,10 @@
     <div class="custom-cursor" id="customCursor" aria-hidden="true"></div>
 
     <main class="site-shell" id="app">
-      <section class="entry-gate" id="entryGate" aria-labelledby="entryTitle">
-        <div class="entry-card" aria-hidden="true">
-          <span>联邦搜查部 Schale</span>
-          <strong>访问认证中</strong>
-        </div>
-        <div class="entry-mark">
-          <h1 id="entryTitle">KuaiLeBozi</h1>
-          <p>正在连接夏日记忆大厅</p>
-        </div>
-        <div class="entry-loader" aria-hidden="true">
-          <span><i id="loadingProgress"></i></span>
-          <strong id="loadingLabel">Loading 0%</strong>
-        </div>
-        <button class="enter-button" id="enterButton" type="button" disabled>
+      <section class="entry-gate" id="entryGate" aria-label="进入主页">
+        <button class="enter-button" id="enterButton" type="button">
           <span>TOUCH TO START</span>
-          <small>准备中</small>
+          <small>进入基沃托斯</small>
         </button>
       </section>
 
@@ -109,27 +97,11 @@
       </section>
     </main>
 
-    <div class="player" id="player" aria-label="Music player">
-      <button class="icon-button" id="playPauseButton" type="button" aria-label="Pause music">
-        <span aria-hidden="true">II</span>
-      </button>
-      <button class="icon-button" id="nextButton" type="button" aria-label="Next track">
-        <span aria-hidden="true">&gt;</span>
-      </button>
-      <button class="icon-button" id="muteButton" type="button" aria-label="Mute music">
-        <span aria-hidden="true">M</span>
-      </button>
-      <div class="track-meta">
-        <span>正在播放</span>
-        <strong id="trackTitle">Hello to Halo</strong>
-      </div>
-    </div>
-
     <noscript>
-      <p class="noscript">请启用 JavaScript 以加载音乐控制与个人档案内容。</p>
+      <p class="noscript">请启用 JavaScript 以加载动态背景与个人档案内容。</p>
     </noscript>
 
     <script defer src="assets/js/site-config.js?v=click-1080-1"></script>
-    <script defer src="assets/js/app.js?v=single-video-1"></script>
+    <script defer src="assets/js/app.js?v=dynamic-bg-1"></script>
   </body>
 </html>

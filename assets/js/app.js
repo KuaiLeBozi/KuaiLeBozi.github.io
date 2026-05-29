@@ -6,38 +6,21 @@
       return;
     }
 
-    const backgroundVideos = {
-      start: "assets/media/CH0295_home_Start_Idle_01.webm",
-      idle: "assets/media/CH0295_home_Idle_01.webm",
-    };
-
     const state = {
       entered: false,
-      trackIndex: 0,
-      muted: false,
-      lobbyPhase: "start",
-      audio: new Audio(),
     };
 
     const $ = (selector) => document.querySelector(selector);
     const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
     const elements = {
-      memoryLobby: $("#memoryLobby"),
+      liveBackground: $("#liveBackground"),
       entryGate: $("#entryGate"),
       enterButton: $("#enterButton"),
-      player: $("#player"),
-      playPauseButton: $("#playPauseButton"),
-      nextButton: $("#nextButton"),
-      muteButton: $("#muteButton"),
-      trackTitle: $("#trackTitle"),
-      statusTrack: $("#statusTrack"),
       heroEyebrow: $("#heroEyebrow"),
       heroTitle: $("#heroTitle"),
       heroBio: $("#heroBio"),
       heroActions: $("#heroActions"),
-      loadingProgress: $("#loadingProgress"),
-      loadingLabel: $("#loadingLabel"),
       profileName: $("#profileName"),
       profileText: $("#profileText"),
       factList: $("#factList"),
@@ -120,51 +103,11 @@
       );
     }
 
-    function currentTrack() {
-      return config.playlist[state.trackIndex];
-    }
-
-    function updateTrackUi() {
-      const track = currentTrack();
-      elements.trackTitle.textContent = track.title;
-      if (elements.statusTrack) {
-        elements.statusTrack.textContent = track.title;
-      }
-      elements.playPauseButton.setAttribute(
-        "aria-label",
-        state.audio.paused ? "Play music" : "Pause music"
-      );
-      elements.playPauseButton.querySelector("span").textContent = state.audio.paused ? ">" : "II";
-      elements.muteButton.setAttribute("aria-label", state.muted ? "Unmute music" : "Mute music");
-      elements.muteButton.querySelector("span").textContent = state.muted ? "X" : "M";
-    }
-
-    function loadTrack(index, shouldPlay) {
-      state.trackIndex = (index + config.playlist.length) % config.playlist.length;
-      state.audio.src = currentTrack().src;
-      state.audio.loop = false;
-      state.audio.muted = state.muted;
-      updateTrackUi();
-
-      if (shouldPlay) {
-        playAudio();
-      }
-    }
-
-    function playAudio() {
-      return state.audio
-        .play()
-        .then(updateTrackUi)
-        .catch(updateTrackUi);
-    }
-
     function autoEnterSite() {
       if (state.entered) return;
       state.entered = true;
       document.body.classList.add("has-entered");
       elements.entryGate.setAttribute("aria-hidden", "true");
-      elements.player.classList.add("is-visible");
-      loadTrack(0, true);
     }
 
     function enableEnterButton() {
@@ -173,87 +116,8 @@
       elements.enterButton.querySelector("small").textContent = "进入基沃托斯";
     }
 
-    function updateLoadingProgress(ratio) {
-      const progress = Math.max(0, Math.min(ratio, 1));
-      elements.loadingProgress.style.transform = `scaleX(${progress})`;
-      elements.loadingLabel.textContent = `Loading ${Math.round(progress * 100)}%`;
-    }
-
-    function waitForVideoReady(video) {
-      if (video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
-        return Promise.resolve();
-      }
-
-      return new Promise((resolve, reject) => {
-        const cleanup = () => {
-          video.removeEventListener("canplay", handleReady);
-          video.removeEventListener("loadeddata", handleReady);
-          video.removeEventListener("error", handleError);
-        };
-        const handleReady = () => {
-          cleanup();
-          resolve();
-        };
-        const handleError = () => {
-          cleanup();
-          reject(new Error("Lobby video failed to decode."));
-        };
-
-        video.addEventListener("canplay", handleReady, { once: true });
-        video.addEventListener("loadeddata", handleReady, { once: true });
-        video.addEventListener("error", handleError, { once: true });
-        video.load();
-      });
-    }
-
-    function loadLobbyVideo(src) {
-      const video = elements.memoryLobby;
-      video.src = src;
-      video.loop = false;
-      video.muted = true;
-      video.playsInline = true;
-      video.preload = "auto";
-      video.load();
-    }
-
-    async function initLobbyVideo() {
-      updateLoadingProgress(0);
-      state.lobbyPhase = "start";
-      loadLobbyVideo(backgroundVideos.start);
-
-      try {
-        await waitForVideoReady(elements.memoryLobby);
-      } catch (_) {
-        // Keep going so the visible page is not blocked forever by media errors.
-      }
-
-      updateLoadingProgress(1);
-      elements.loadingLabel.textContent = "Ready";
+    function initEntry() {
       enableEnterButton();
-      elements.memoryLobby.play().catch(() => {});
-    }
-
-    function replayIdleVideo() {
-      const video = elements.memoryLobby;
-      try {
-        video.currentTime = 0;
-      } catch (_) {
-        loadLobbyVideo(backgroundVideos.idle);
-      }
-      video.play().catch(() => {});
-    }
-
-    function handleLobbyEnded() {
-      if (state.lobbyPhase === "start") {
-        state.lobbyPhase = "idle";
-        loadLobbyVideo(backgroundVideos.idle);
-        waitForVideoReady(elements.memoryLobby)
-          .catch(() => {})
-          .finally(() => elements.memoryLobby.play().catch(() => {}));
-        return;
-      }
-
-      replayIdleVideo();
     }
 
     function removeOldMediaWorkers() {
@@ -279,25 +143,6 @@
       ]);
     }
 
-    function togglePlay() {
-      if (state.audio.paused) {
-        playAudio();
-      } else {
-        state.audio.pause();
-        updateTrackUi();
-      }
-    }
-
-    function nextTrack() {
-      loadTrack(state.trackIndex + 1, !state.audio.paused);
-    }
-
-    function toggleMute() {
-      state.muted = !state.muted;
-      state.audio.muted = state.muted;
-      updateTrackUi();
-    }
-
     function switchPanel(panelName) {
       const target = panelName === "home" ? "profile" : panelName;
       elements.navTabs.forEach((tab) => {
@@ -314,13 +159,6 @@
 
     function bindEvents() {
       elements.enterButton.addEventListener("click", autoEnterSite);
-      elements.playPauseButton.addEventListener("click", togglePlay);
-      elements.nextButton.addEventListener("click", nextTrack);
-      elements.muteButton.addEventListener("click", toggleMute);
-      elements.memoryLobby.addEventListener("ended", handleLobbyEnded);
-      state.audio.addEventListener("ended", () => loadTrack(state.trackIndex + 1, true));
-      state.audio.addEventListener("play", updateTrackUi);
-      state.audio.addEventListener("pause", updateTrackUi);
 
       [...elements.navTabs, $(".brand")].forEach((control) => {
         control.addEventListener("click", () => switchPanel(control.dataset.panel));
@@ -338,9 +176,8 @@
     }
 
     renderContent();
-    loadTrack(0, false);
     bindEvents();
-    cleanupOldBackgroundWorkers().finally(initLobbyVideo);
+    cleanupOldBackgroundWorkers().finally(initEntry);
   }
 
   if (document.readyState === "loading") {

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dynamic Background</title>
+    <link rel="stylesheet" href="./assets/live-background.css?v=dynamic-bg-1" />
+    <style>
+      .setting-button,
+      .setting,
+      #loading {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script>
+      (() => {
+        const blockedAudio = /(?:^|\/)Bgm\.wav(?:$|[?#])/i;
+        const srcDescriptor = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, "src");
+        const nativePlay = HTMLMediaElement.prototype.play;
+        const nativePause = HTMLMediaElement.prototype.pause;
+
+        if (srcDescriptor?.set && srcDescriptor?.get) {
+          Object.defineProperty(HTMLMediaElement.prototype, "src", {
+            configurable: true,
+            enumerable: srcDescriptor.enumerable,
+            get() {
+              return srcDescriptor.get.call(this);
+            },
+            set(value) {
+              if (this.id === "bgm" || blockedAudio.test(String(value || ""))) {
+                this.removeAttribute("src");
+                return;
+              }
+
+              srcDescriptor.set.call(this, value);
+            },
+          });
+        }
+
+        HTMLMediaElement.prototype.play = function () {
+          if (this.id === "bgm" || blockedAudio.test(this.currentSrc || this.src || "")) {
+            return Promise.resolve();
+          }
+
+          return nativePlay.call(this);
+        };
+        HTMLMediaElement.prototype.pause = function () {
+          return nativePause.call(this);
+        };
+      })();
+    </script>
+    <script type="module" src="./assets/live-background.js?v=dynamic-bg-1"></script>
+  </body>
+</html>
