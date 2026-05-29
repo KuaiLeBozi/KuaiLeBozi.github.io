@@ -4,8 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dynamic Background</title>
-    <link rel="stylesheet" href="./assets/live-background.css?v=mobile-fit-1" />
+    <link rel="stylesheet" href="./assets/live-background.css?v=mobile-fit-2" />
     <style>
+      html,
+      body,
+      #app {
+        width: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+        min-height: 100lvh;
+        background: transparent !important;
+      }
+
+      canvas {
+        min-height: 100vh;
+        min-height: 100dvh;
+        min-height: 100lvh;
+      }
+
       .setting-button,
       .setting,
       #loading {
@@ -44,10 +60,12 @@
               model.version = 9010;
               model.resolution = "2k";
               if (isPortrait) {
-                const mobileScale = Math.min(0.46, Math.max(0.38, window.innerWidth / 940));
+                const viewWidth = window.visualViewport?.width || window.innerWidth;
+                const viewHeight = window.visualViewport?.height || window.innerHeight;
+                const mobileScale = Math.min(0.36, Math.max(0.28, Math.min(viewWidth / 1180, viewHeight / 2450)));
                 model.scale = Number(mobileScale.toFixed(3));
-                model.x = Math.round(window.innerWidth * 0.58);
-                model.y = Math.round(window.innerHeight * 0.94);
+                model.x = Math.round(viewWidth * 0.42);
+                model.y = Math.round(viewHeight * 0.9);
               }
               model.bgmVolume = 0;
               model.talkVolume = 0.82;
@@ -139,6 +157,6 @@
         }
       })();
     </script>
-    <script type="module" src="./assets/live-background.js?v=mobile-fit-1"></script>
+    <script type="module" src="./assets/live-background.js?v=mobile-fit-2"></script>
   </body>
 </html>
