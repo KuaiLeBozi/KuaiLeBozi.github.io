@@ -18,7 +18,7 @@ window.SITE_CONFIG = {
   },
   actions: [
     { label: "GitHub 档案", href: "https://github.com/KuaiLeBozi" },
-    { label: "查看任务", href: "#projects" },
+    { label: "查看任务", panel: "projects" },
   ],
   projects: [
     {
@@ -33,14 +33,14 @@ window.SITE_CONFIG = {
       type: "记录",
       description:
         "预留给文章、学习记录、开发日志，或者任何值得保存的内容。",
-      href: "#links",
+      panel: "links",
     },
     {
       title: "下一项课题",
       type: "开发",
       description:
         "之后可以替换成真实仓库、在线演示、模型、游戏或工具。",
-      href: "#profile",
+      panel: "profile",
     },
   ],
   links: [
