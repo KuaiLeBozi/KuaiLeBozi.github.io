@@ -1,23 +1,23 @@
 window.SITE_CONFIG = {
   profile: {
     eyebrow: "Schale Personal Page",
-    title: "Hi, I am kuailebozi.",
+    title: "Hi, I am KuaiLeBozi.",
     bio:
       "A personal homepage for projects, notes, and small experiments, wrapped in a clean Blue Archive inspired interface.",
-    name: "kuailebozi",
+    name: "KuaiLeBozi",
     about:
       "This page is ready for your real introduction. Replace this text with who you are, what you build, and where people can find your work.",
     nowTitle: "Currently tuning the terminal",
     now:
       "Static GitHub Pages, local media playback, and a soft memory-lobby atmosphere. The content is intentionally easy to edit in this config file.",
     facts: [
-      ["Site", "kuailebozi.github.io"],
+      ["Site", "KuaiLeBozi.github.io"],
       ["Style", "Blue Archive inspired"],
       ["Stack", "HTML, CSS, JavaScript"],
     ],
   },
   actions: [
-    { label: "GitHub", href: "https://github.com/kuailebozi" },
+    { label: "GitHub", href: "https://github.com/KuaiLeBozi" },
     { label: "Projects", href: "#projects" },
   ],
   projects: [
@@ -26,7 +26,7 @@ window.SITE_CONFIG = {
       type: "Homepage",
       description:
         "A small landing point for experiments, project notes, and links worth keeping close.",
-      href: "https://github.com/kuailebozi",
+      href: "https://github.com/KuaiLeBozi",
     },
     {
       title: "Archive Notes",
@@ -44,8 +44,8 @@ window.SITE_CONFIG = {
     },
   ],
   links: [
-    { label: "GitHub", href: "https://github.com/kuailebozi" },
-    { label: "Homepage", href: "https://kuailebozi.github.io/" },
+    { label: "GitHub", href: "https://github.com/KuaiLeBozi" },
+    { label: "Homepage", href: "https://KuaiLeBozi.github.io/" },
     { label: "Email", href: "mailto:hello@example.com" },
   ],
   playlist: [
