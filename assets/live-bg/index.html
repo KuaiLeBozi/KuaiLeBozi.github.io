@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dynamic Background</title>
-    <link rel="stylesheet" href="./assets/live-background.css?v=mobile-fit-2" />
+    <link rel="stylesheet" href="./assets/live-background.css?v=mobile-fit-3" />
     <style>
       html,
       body,
@@ -12,14 +12,14 @@
         width: 100%;
         min-height: 100vh;
         min-height: 100dvh;
-        min-height: 100lvh;
+        min-height: calc(100lvh + 260px);
         background: transparent !important;
       }
 
       canvas {
         min-height: 100vh;
         min-height: 100dvh;
-        min-height: 100lvh;
+        min-height: calc(100lvh + 260px);
       }
 
       .setting-button,
@@ -61,7 +61,11 @@
               model.resolution = "2k";
               if (isPortrait) {
                 const viewWidth = window.visualViewport?.width || window.innerWidth;
-                const viewHeight = window.visualViewport?.height || window.innerHeight;
+                const viewHeight = Math.max(
+                  window.visualViewport?.height || 0,
+                  window.innerHeight,
+                  document.documentElement.clientHeight
+                );
                 const mobileScale = Math.min(0.36, Math.max(0.28, Math.min(viewWidth / 1180, viewHeight / 2450)));
                 model.scale = Number(mobileScale.toFixed(3));
                 model.x = Math.round(viewWidth * 0.42);
@@ -157,6 +161,6 @@
         }
       })();
     </script>
-    <script type="module" src="./assets/live-background.js?v=mobile-fit-2"></script>
+    <script type="module" src="./assets/live-background.js?v=mobile-fit-3"></script>
   </body>
 </html>
