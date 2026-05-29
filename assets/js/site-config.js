@@ -48,8 +48,7 @@ window.SITE_CONFIG = {
     },
   ],
   links: [
-    { label: "GitHub", href: "https://github.com/KuaiLeBozi" },
-    { label: "Homepage", href: "https://KuaiLeBozi.github.io/" },
-    { label: "Email", href: "mailto:hello@example.com" },
+    { label: "QQ", value: "2406659686", description: "QQ: 2406659686" },
+    { label: "B服 ID", value: "a6wt9z6", description: "B服 ID: a6wt9z6" },
   ],
 };

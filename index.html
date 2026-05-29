@@ -10,13 +10,13 @@
     <title>KuaileBozi</title>
     <link rel="icon" type="image/png" sizes="32x32" href="assets/media/favicon-32.png?v=icon-2" />
     <link rel="apple-touch-icon" href="assets/media/apple-touch-icon.png?v=icon-2" />
-    <link rel="stylesheet" href="assets/css/styles.css?v=clean-1" />
+    <link rel="stylesheet" href="assets/css/styles.css?v=blog-1" />
   </head>
   <body>
     <iframe
       class="live-background"
       id="liveBackground"
-      src="assets/live-bg/index.html?v=clean-1"
+      src="assets/live-bg/index.html?v=blog-1"
       title=""
       tabindex="-1"
       aria-hidden="true"
@@ -69,6 +69,7 @@
             </div>
           </div>
           <audio id="siteMusic" preload="auto"></audio>
+          <audio id="voiceAudio" preload="auto"></audio>
         </aside>
 
         <section class="home-layout" id="home">
@@ -92,6 +93,34 @@
                 <h4 id="nowTitle"></h4>
                 <p id="nowText"></p>
               </div>
+            </article>
+
+            <article class="panel-view" id="panel-projects" data-panel-view="projects">
+              <div class="section-heading">
+                <span class="panel-label">Blog 记录</span>
+                <h3>研究与学习笔记</h3>
+              </div>
+              <div class="project-grid" id="projectGrid"></div>
+              <article class="blog-reader" id="blogReader" hidden>
+                <button class="blog-back" id="blogBack" type="button">返回 Blog 列表</button>
+                <div class="section-heading">
+                  <span class="panel-label" id="blogType">Blog</span>
+                  <h3 id="blogTitle"></h3>
+                </div>
+                <p class="blog-summary" id="blogSummary"></p>
+                <dl class="project-meta blog-meta" id="blogMeta"></dl>
+                <div class="detail-sections" id="blogSections"></div>
+                <div class="hero-actions" id="blogActions"></div>
+              </article>
+            </article>
+
+            <article class="panel-view" id="panel-links" data-panel-view="links">
+              <div class="section-heading">
+                <span class="panel-label">通讯频道</span>
+                <h3>联系与传送门</h3>
+              </div>
+              <div class="link-list" id="linkList"></div>
+              <div class="contact-detail" id="contactDetail" aria-live="polite"></div>
               <section class="comments-section" aria-label="GitHub 评论区">
                 <div class="section-heading">
                   <span class="panel-label">留言板</span>
@@ -110,22 +139,6 @@
                 </div>
               </section>
             </article>
-
-            <article class="panel-view" id="panel-projects" data-panel-view="projects">
-              <div class="section-heading">
-                <span class="panel-label">研究看板</span>
-                <h3>正在推进的方向</h3>
-              </div>
-              <div class="project-grid" id="projectGrid"></div>
-            </article>
-
-            <article class="panel-view" id="panel-links" data-panel-view="links">
-              <div class="section-heading">
-                <span class="panel-label">通讯频道</span>
-                <h3>联系与传送门</h3>
-              </div>
-              <div class="link-list" id="linkList"></div>
-            </article>
           </section>
         </section>
       </section>
@@ -135,8 +148,8 @@
       <p class="noscript">请启用 JavaScript 以加载动态背景与个人档案内容。</p>
     </noscript>
 
-    <script defer src="assets/js/global-ui.js?v=clean-1"></script>
-    <script defer src="assets/js/site-config.js?v=clean-1"></script>
-    <script defer src="assets/js/app.js?v=clean-1"></script>
+    <script defer src="assets/js/global-ui.js?v=blog-1"></script>
+    <script defer src="assets/js/site-config.js?v=blog-1"></script>
+    <script defer src="assets/js/app.js?v=blog-1"></script>
   </body>
 </html>

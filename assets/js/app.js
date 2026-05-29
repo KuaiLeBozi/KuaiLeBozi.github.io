@@ -1,4 +1,6 @@
 (function () {
+  const previewDraftKey = "kuailebozi-admin-preview-draft";
+
   function boot() {
     const config = window.SITE_CONFIG;
     if (!config) {
@@ -11,6 +13,8 @@
       musicIndex: 0,
       musicReady: false,
       musicPlaying: false,
+      voiceIndex: 0,
+      projects: [],
       playerDragging: false,
       playerMoved: false,
       playerPointerId: null,
@@ -23,6 +27,20 @@
       { title: "Thanks to (KR Ver.)", src: "assets/music/thanks-to-kr-ver.mp3" },
       { title: "Hifumi Daisuki", src: "assets/music/hifumi-daisuki-ost.mp3" },
       { title: "Dolce Biblioteca", src: "assets/music/dolce-biblioteca-ost.mp3" },
+    ];
+
+    const voiceTracks = [
+      "assets/live-bg/sound/CH0295_MemorialLobby_1_1.wav",
+      "assets/live-bg/sound/CH0295_MemorialLobby_1_2.wav",
+      "assets/live-bg/sound/CH0295_MemorialLobby_2_1.wav",
+      "assets/live-bg/sound/CH0295_MemorialLobby_2_2.wav",
+      "assets/live-bg/sound/CH0295_MemorialLobby_3_1.wav",
+      "assets/live-bg/sound/CH0295_MemorialLobby_3_2.wav",
+      "assets/live-bg/sound/CH0295_MemorialLobby_4_1.wav",
+      "assets/live-bg/sound/CH0295_MemorialLobby_4_2.wav",
+      "assets/live-bg/sound/CH0295_MemorialLobby_5_1.wav",
+      "assets/live-bg/sound/CH0295_MemorialLobby_5_2.wav",
+      "assets/live-bg/sound/CH0295_MemorialLobby_5_3.wav",
     ];
 
     const $ = (selector) => document.querySelector(selector);
@@ -44,7 +62,16 @@
       nowTitle: $("#nowTitle"),
       nowText: $("#nowText"),
       projectGrid: $("#projectGrid"),
+      blogReader: $("#blogReader"),
+      blogBack: $("#blogBack"),
+      blogType: $("#blogType"),
+      blogTitle: $("#blogTitle"),
+      blogSummary: $("#blogSummary"),
+      blogMeta: $("#blogMeta"),
+      blogSections: $("#blogSections"),
+      blogActions: $("#blogActions"),
       linkList: $("#linkList"),
+      contactDetail: $("#contactDetail"),
       navTabs: $$(".nav-tab"),
       panelViews: $$(".panel-view"),
       customCursor: $("#customCursor"),
@@ -55,17 +82,27 @@
       musicNext: $("#musicNext"),
       musicSelect: $("#musicSelect"),
       siteMusic: $("#siteMusic"),
+      voiceAudio: $("#voiceAudio"),
     };
 
     function createLink(item, className) {
-      const link = document.createElement("a");
+      const link = document.createElement(item.href || item.url ? "a" : "button");
       link.className = className;
-      link.href = item.href || "#";
       link.textContent = item.label;
+      if (link.tagName === "BUTTON") {
+        link.type = "button";
+      } else {
+        link.href = item.href || item.url || "#";
+      }
       if (item.panel) {
         link.dataset.panel = item.panel;
       }
-      if (item.href && item.href.startsWith("http")) {
+      if (item.value || item.description) {
+        link.dataset.contactLabel = item.label || "";
+        link.dataset.contactValue = item.value || "";
+        link.dataset.contactDescription = item.description || `${item.label}: ${item.value}`;
+      }
+      if ((item.href || item.url || "").startsWith("http")) {
         link.target = "_blank";
         link.rel = "noreferrer";
       }
@@ -110,36 +147,35 @@
     }
 
     function createProjectCard(project) {
-      const card = document.createElement("a");
+      const card = document.createElement("button");
       card.className = "project-card";
-      card.href = project.href || `project.html?id=${encodeURIComponent(project.id || "")}`;
-      if (project.panel) {
-        card.dataset.panel = project.panel;
-      }
-      if (project.href && project.href.startsWith("http")) {
-        card.target = "_blank";
-        card.rel = "noreferrer";
-      }
+      card.type = "button";
+      card.dataset.projectId = project.id || "";
 
       const type = document.createElement("span");
       const title = document.createElement("h4");
       const description = document.createElement("p");
+      const meta = document.createElement("small");
       type.textContent = project.type;
       title.textContent = project.title;
       description.textContent = project.description;
-      card.append(type, title, description);
+      meta.textContent = project.updated ? `Blog / ${project.updated}` : "Blog";
+      card.append(type, title, description, meta);
       return card;
     }
 
     function renderProjects(projects) {
       if (!Array.isArray(projects) || projects.length === 0) return;
+      state.projects = projects;
+      elements.projectGrid.hidden = false;
+      elements.blogReader.hidden = true;
       elements.projectGrid.replaceChildren(
         ...projects.map((project) => createProjectCard({
           id: project.id,
           title: project.title,
           type: project.type,
           description: project.description || project.summary || "",
-          href: `project.html?id=${encodeURIComponent(project.id)}`,
+          updated: project.updated,
         }))
       );
     }
@@ -150,21 +186,69 @@
         ...links.map((item) => createLink({
           label: item.label,
           href: item.url || item.href,
+          value: item.value,
+          description: item.description,
         }, "social-link"))
       );
+      elements.contactDetail.textContent = "选择一个通讯频道后，这里会显示对应联系方式。";
+    }
+
+    function shouldUsePreviewDraft() {
+      return new URLSearchParams(window.location.search).get("preview") === "1";
+    }
+
+    function getPreviewDraftData() {
+      if (!shouldUsePreviewDraft()) return null;
+
+      try {
+        const draft = JSON.parse(sessionStorage.getItem(previewDraftKey) || "null");
+        return draft?.data || null;
+      } catch {
+        return null;
+      }
+    }
+
+    function applyProjectData(data) {
+      if (data.profile) {
+        Object.assign(config.profile, data.profile);
+        renderContent();
+      }
+      renderProjects(data.projects);
+      renderLinks(data.links);
     }
 
     function loadProjectData() {
+      const previewData = getPreviewDraftData();
+      if (previewData) {
+        applyProjectData(previewData);
+        return Promise.resolve();
+      }
+
       return fetch("assets/data/projects.json?v=content-1", { cache: "no-store" })
         .then((response) => {
           if (!response.ok) throw new Error("Project data unavailable");
           return response.json();
         })
-        .then((data) => {
-          renderProjects(data.projects);
-          renderLinks(data.links);
-        })
+        .then(applyProjectData)
         .catch(() => {});
+    }
+
+    function applyInitialRoute() {
+      const params = new URLSearchParams(window.location.search);
+      const requestedPanel = params.get("panel");
+      const requestedBlog = params.get("blog");
+
+      if (["profile", "projects", "links", "home"].includes(requestedPanel)) {
+        switchPanel(requestedPanel);
+      }
+
+      if (requestedBlog) {
+        const project = state.projects.find((item) => item.id === requestedBlog);
+        if (project) {
+          switchPanel("projects");
+          renderBlogDetail(project);
+        }
+      }
     }
 
     function autoEnterSite() {
@@ -224,7 +308,6 @@
     function playNextTrack() {
       const nextIndex = (state.musicIndex + 1) % musicTracks.length;
       setMusicTrack(nextIndex);
-      if (!state.musicPlaying) return;
       playMusic();
     }
 
@@ -251,6 +334,15 @@
       }
 
       pauseMusic();
+    }
+
+    function playVoiceLine() {
+      const source = voiceTracks[state.voiceIndex % voiceTracks.length];
+      state.voiceIndex += 1;
+      elements.voiceAudio.src = source;
+      elements.voiceAudio.volume = 0.62;
+      elements.voiceAudio.currentTime = 0;
+      elements.voiceAudio.play().catch(() => {});
     }
 
     function clamp(value, min, max) {
@@ -395,6 +487,61 @@
       });
     }
 
+    function createMetaItem(label, value) {
+      const wrapper = document.createElement("div");
+      const term = document.createElement("dt");
+      const detail = document.createElement("dd");
+      term.textContent = label;
+      detail.textContent = value;
+      wrapper.append(term, detail);
+      return wrapper;
+    }
+
+    function createBlogAction(link) {
+      return createLink({
+        label: link.label,
+        href: link.url || link.href,
+        value: link.value,
+        description: link.description,
+      }, "action-link");
+    }
+
+    function renderBlogDetail(project) {
+      if (!project) return;
+      elements.projectGrid.hidden = true;
+      elements.blogReader.hidden = false;
+      elements.blogType.textContent = project.type || "Blog";
+      elements.blogTitle.textContent = project.title || "";
+      elements.blogSummary.textContent = project.summary || project.description || "";
+      elements.blogMeta.replaceChildren(
+        createMetaItem("Status", project.status || "未设置"),
+        createMetaItem("Updated", project.updated || "未设置"),
+        createMetaItem("Tags", (project.tags || []).join(" / ") || "未设置")
+      );
+      elements.blogSections.replaceChildren(
+        ...(project.sections || []).map((section) => {
+          const block = document.createElement("section");
+          block.className = "detail-section";
+          const heading = document.createElement("h2");
+          const body = document.createElement("p");
+          heading.textContent = section.heading || "";
+          body.textContent = section.body || "";
+          block.append(heading, body);
+          return block;
+        })
+      );
+      elements.blogActions.replaceChildren(
+        ...(project.links || []).map(createBlogAction)
+      );
+    }
+
+    function showBlogList() {
+      elements.projectGrid.hidden = false;
+      elements.blogReader.hidden = true;
+      elements.blogSections.replaceChildren();
+      elements.blogActions.replaceChildren();
+    }
+
     function placePlayer(x, y) {
       const rect = elements.fixedPlayer.getBoundingClientRect();
       const gap = 12;
@@ -487,6 +634,13 @@
       elements.siteMusic.addEventListener("play", () => updateMusicState(true));
       elements.siteMusic.addEventListener("pause", () => updateMusicState(false));
       window.addEventListener("resize", resetPlayerPosition);
+      elements.blogBack.addEventListener("click", showBlogList);
+      elements.projectGrid.addEventListener("click", (event) => {
+        const card = event.target.closest("[data-project-id]");
+        if (!card) return;
+        const project = state.projects.find((item) => item.id === card.dataset.projectId);
+        renderBlogDetail(project);
+      });
 
       [...elements.navTabs, $(".brand")].forEach((control) => {
         control.addEventListener("click", () => switchPanel(control.dataset.panel));
@@ -499,8 +653,18 @@
         event.preventDefault();
         switchPanel(panelLink.dataset.panel);
       });
+      elements.linkList.addEventListener("click", (event) => {
+        const contact = event.target.closest("[data-contact-description]");
+        if (!contact) return;
+        event.preventDefault();
+        elements.contactDetail.textContent = contact.dataset.contactDescription;
+      });
 
       document.addEventListener("pointerdown", handleLiveBackgroundTouch, true);
+      document.addEventListener("pointerup", (event) => {
+        if (!shouldForwardTouch(event)) return;
+        playVoiceLine();
+      }, true);
       document.addEventListener("pointermove", handleLiveBackgroundTouch, true);
       document.addEventListener("pointerup", handleLiveBackgroundTouch, true);
     }
@@ -508,7 +672,7 @@
     renderContent();
     initMusicOptions();
     elements.homeLayout.classList.add("is-profile-panel");
-    loadProjectData();
+    loadProjectData().then(applyInitialRoute);
     bindEvents();
     cleanupOldBackgroundWorkers().finally(initEntry);
   }

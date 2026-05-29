@@ -1,16 +1,30 @@
 {
+  "profile": {
+    "eyebrow": "联邦搜查部 Schale / 个人档案",
+    "title": "欢迎，老师。",
+    "bio": "这里是 KuaileBozi 的个人主页，用来收纳项目、笔记、研究记录和一些正在进行的小实验。XWX",
+    "name": "KuaileBozi",
+    "about": "华中科技大学网络空间安全学院 2024 级学生，目前在实习与探索 diffusion 等方向。华科七边形一员，努力把有趣的想法做成能跑起来的小东西。XWX",
+    "nowTitle": "正在实习与研究 diffusion",
+    "now": "当前关注方向包括生成模型、网络空间安全、前端交互和一些个人实验项目。欢迎用 GitHub 账号在下方留言交流。>w<",
+    "facts": [
+      ["Site", "KuaileBozi.github.io"],
+      ["School", "华中科技大学网络空间安全学院"],
+      ["Grade", "2024 级"],
+      ["Focus", "Diffusion / AI / Cybersecurity"],
+      ["Team", "华科七边形"]
+    ]
+  },
   "links": [
     {
-      "label": "GitHub",
-      "url": "https://github.com/KuaiLeBozi"
+      "label": "QQ",
+      "value": "2406659686",
+      "description": "QQ: 2406659686"
     },
     {
-      "label": "Homepage",
-      "url": "https://KuaiLeBozi.github.io/"
-    },
-    {
-      "label": "Email",
-      "url": "mailto:hello@example.com"
+      "label": "B服 ID",
+      "value": "a6wt9z6",
+      "description": "B服 ID: a6wt9z6"
     }
   ],
   "projects": [

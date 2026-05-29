@@ -1,4 +1,5 @@
 (function () {
+  const previewDraftKey = "kuailebozi-admin-preview-draft";
   const $ = (selector) => document.querySelector(selector);
 
   const elements = {
@@ -8,13 +9,28 @@
     actions: $("#projectActions"),
     meta: $("#projectMeta"),
     sections: $("#projectSections"),
-    cursor: $("#customCursor"),
     liveBackground: $("#liveBackground"),
   };
 
   function getProjectId() {
     const params = new URLSearchParams(window.location.search);
     return params.get("id") || "diffusion";
+  }
+
+  function shouldUsePreviewDraft() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("preview") === "1";
+  }
+
+  function getPreviewDraftData() {
+    if (!shouldUsePreviewDraft()) return null;
+
+    try {
+      const draft = JSON.parse(sessionStorage.getItem(previewDraftKey) || "null");
+      return draft?.data || null;
+    } catch {
+      return null;
+    }
   }
 
   function createLink(link) {
@@ -81,10 +97,6 @@
     elements.sections.replaceChildren();
   }
 
-  function updateCursor(event) {
-    elements.cursor.style.transform = `translate(${event.clientX}px, ${event.clientY}px)`;
-  }
-
   function createForwardedMouseEvent(type, sourceEvent, options = {}) {
     return new MouseEvent(type, {
       bubbles: true,
@@ -138,11 +150,16 @@
     }
   }
 
-  fetch("assets/data/projects.json?v=content-1", { cache: "no-store" })
+  const previewData = getPreviewDraftData();
+  const dataPromise = previewData
+    ? Promise.resolve(previewData)
+    : fetch("assets/data/projects.json?v=content-1", { cache: "no-store" })
     .then((response) => {
       if (!response.ok) throw new Error("Unable to load project data");
       return response.json();
-    })
+    });
+
+  dataPromise
     .then((data) => {
       const project = (data.projects || []).find((item) => item.id === getProjectId());
       if (project) {
@@ -153,7 +170,6 @@
     })
     .catch(renderNotFound);
 
-  document.addEventListener("pointermove", updateCursor);
   document.addEventListener("pointerdown", forwardLiveBackgroundPointer, true);
   document.addEventListener("pointermove", forwardLiveBackgroundPointer, true);
   document.addEventListener("pointerup", forwardLiveBackgroundPointer, true);

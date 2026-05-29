@@ -3,15 +3,19 @@
   const repoName = "KuaiLeBozi.github.io";
   const branch = "main";
   const dataPath = "assets/data/projects.json";
+  const previewDraftKey = "kuailebozi-admin-preview-draft";
 
   const $ = (selector) => document.querySelector(selector);
 
   const elements = {
     form: $("#adminForm"),
     token: $("#githubToken"),
+    loginButton: $("#loginButton"),
+    loginState: $("#loginState"),
     mode: $("#contentMode"),
     projectSelectWrap: $("#projectSelectWrap"),
     projectEditor: $("#projectEditor"),
+    profileEditor: $("#profileEditor"),
     linksEditor: $("#linksEditor"),
     select: $("#projectSelect"),
     title: $("#projectTitleInput"),
@@ -22,23 +26,70 @@
     tags: $("#projectTagsInput"),
     sections: $("#projectSectionsInput"),
     links: $("#projectLinksInput"),
+    profileEyebrow: $("#profileEyebrowInput"),
+    profileTitle: $("#profileTitleInput"),
+    profileBio: $("#profileBioInput"),
+    profileName: $("#profileNameInput"),
+    profileAbout: $("#profileAboutInput"),
+    profileNowTitle: $("#profileNowTitleInput"),
+    profileNow: $("#profileNowInput"),
+    profileFacts: $("#profileFactsInput"),
     siteLinks: $("#siteLinksInput"),
+    save: $("#saveProject"),
     message: $("#adminStatus"),
     preview: $("#previewLink"),
-    cursor: $("#customCursor"),
     liveBackground: $("#liveBackground"),
   };
 
-  let contentData = { links: [], projects: [] };
+  const defaultProfile = {
+    eyebrow: "联邦搜查部 SCHALE / 个人档案",
+    title: "欢迎，老师。",
+    bio: "这里是 KuaileBozi 的个人主页，用来收纳项目、笔记、研究记录和一些正在进行的小实验。XWX",
+    name: "KuaileBozi",
+    about: "华中科技大学网络空间安全学院 2024 级学生，目前在实习与探索 diffusion 等方向。华科七边形一员，努力把有趣的想法做成能跑起来的小东西。XWX",
+    nowTitle: "正在实习与研究 diffusion",
+    now: "当前关注方向包括生成模型、网络空间安全、前端交互和一些个人实验项目。欢迎用 GitHub 账号在下方留言交流。>w<",
+    facts: [
+      ["Site", "KuaileBozi.github.io"],
+      ["School", "华中科技大学网络空间安全学院"],
+      ["Grade", "2024 级"],
+      ["Focus", "Diffusion / AI / Cybersecurity"],
+      ["Team", "华科七边形"],
+    ],
+  };
+
+  let contentData = { profile: { ...defaultProfile }, links: [], projects: [] };
   let fileSha = "";
+  let activeMode = "projects";
+  let activeProjectId = "";
 
   function setStatus(message, isError = false) {
     elements.message.textContent = message;
     elements.message.classList.toggle("is-error", isError);
   }
 
+  function normalizeContentData(data) {
+    contentData = {
+      profile: {
+        ...defaultProfile,
+        ...(data?.profile || {}),
+        facts: Array.isArray(data?.profile?.facts) ? data.profile.facts : defaultProfile.facts,
+      },
+      links: Array.isArray(data?.links) ? data.links : [],
+      projects: Array.isArray(data?.projects) ? data.projects : [],
+    };
+  }
+
+  function getProjectById(id) {
+    return contentData.projects.find((project) => project.id === id);
+  }
+
   function getSelectedProject() {
-    return contentData.projects.find((project) => project.id === elements.select.value);
+    return getProjectById(elements.select.value);
+  }
+
+  function getActiveProject() {
+    return getProjectById(activeProjectId || elements.select.value);
   }
 
   function sectionsToText(sections) {
@@ -63,7 +114,7 @@
 
   function linksToText(links) {
     return (links || [])
-      .map((link) => `${link.label || ""} | ${link.url || ""}`)
+      .map((link) => `${link.label || ""} | ${link.url || link.href || link.value || ""} | ${link.description || ""}`)
       .join("\n");
   }
 
@@ -73,17 +124,50 @@
       .map((line) => line.trim())
       .filter(Boolean)
       .map((line) => {
-        const [label, ...urlParts] = line.split("|");
+        const [label, value = "", ...descriptionParts] = line.split("|");
+        const trimmedValue = value.trim();
+        const isUrl = /^(https?:|mailto:)/i.test(trimmedValue);
         return {
           label: label.trim(),
-          url: urlParts.join("|").trim(),
+          ...(isUrl ? { url: trimmedValue } : { value: trimmedValue }),
+          description: descriptionParts.join("|").trim() || `${label.trim()}: ${trimmedValue}`,
         };
       })
-      .filter((link) => link.label && link.url);
+      .filter((link) => link.label && (link.url || link.value));
+  }
+
+  function factsToText(facts) {
+    return (facts || [])
+      .map(([label, value]) => `${label || ""} | ${value || ""}`)
+      .join("\n");
+  }
+
+  function textToFacts(text) {
+    return text
+      .split(/\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        const [label, ...valueParts] = line.split("|");
+        return [label.trim(), valueParts.join("|").trim()];
+      })
+      .filter(([label, value]) => label && value);
+  }
+
+  function getPreviewHref(projectId = activeProjectId || elements.select.value) {
+    if (activeMode === "links") return "index.html?preview=1&panel=links";
+    if (activeMode === "profile") return "index.html?preview=1&panel=profile";
+    return `index.html?preview=1&panel=projects&blog=${encodeURIComponent(projectId || "")}`;
+  }
+
+  function refreshPreviewHref() {
+    elements.preview.href = getPreviewHref();
   }
 
   function fillProject(project) {
     if (!project) return;
+    activeProjectId = project.id;
+    elements.select.value = project.id;
     elements.title.value = project.title || "";
     elements.type.value = project.type || "";
     elements.status.value = project.status || "";
@@ -92,7 +176,19 @@
     elements.tags.value = (project.tags || []).join(", ");
     elements.sections.value = sectionsToText(project.sections);
     elements.links.value = linksToText(project.links);
-    elements.preview.href = `project.html?id=${encodeURIComponent(project.id)}`;
+    refreshPreviewHref();
+  }
+
+  function fillProfile() {
+    const profile = contentData.profile || defaultProfile;
+    elements.profileEyebrow.value = profile.eyebrow || "";
+    elements.profileTitle.value = profile.title || "";
+    elements.profileBio.value = profile.bio || "";
+    elements.profileName.value = profile.name || "";
+    elements.profileAbout.value = profile.about || "";
+    elements.profileNowTitle.value = profile.nowTitle || "";
+    elements.profileNow.value = profile.now || "";
+    elements.profileFacts.value = factsToText(profile.facts);
   }
 
   function fillSiteLinks() {
@@ -100,7 +196,7 @@
   }
 
   function syncProjectFromForm() {
-    const project = getSelectedProject();
+    const project = getActiveProject();
     if (!project) return;
     project.title = elements.title.value.trim();
     project.type = elements.type.value.trim();
@@ -114,23 +210,67 @@
       .filter(Boolean);
     project.sections = textToSections(elements.sections.value);
     project.links = textToLinks(elements.links.value);
+    refreshPreviewHref();
+  }
+
+  function syncProfileFromForm() {
+    contentData.profile = {
+      eyebrow: elements.profileEyebrow.value.trim(),
+      title: elements.profileTitle.value.trim(),
+      bio: elements.profileBio.value.trim(),
+      name: elements.profileName.value.trim(),
+      about: elements.profileAbout.value.trim(),
+      nowTitle: elements.profileNowTitle.value.trim(),
+      now: elements.profileNow.value.trim(),
+      facts: textToFacts(elements.profileFacts.value),
+    };
   }
 
   function syncLinksFromForm() {
     contentData.links = textToLinks(elements.siteLinks.value);
   }
 
-  function setMode(mode) {
-    const editingLinks = mode === "links";
-    elements.projectSelectWrap.hidden = editingLinks;
-    elements.projectEditor.hidden = editingLinks;
-    elements.linksEditor.hidden = !editingLinks;
-    elements.preview.href = editingLinks ? "index.html" : `project.html?id=${encodeURIComponent(elements.select.value || "diffusion")}`;
-    if (editingLinks) {
-      fillSiteLinks();
+  function syncCurrentEditor() {
+    if (activeMode === "links") {
+      syncLinksFromForm();
       return;
     }
-    fillProject(getSelectedProject());
+    if (activeMode === "profile") {
+      syncProfileFromForm();
+      return;
+    }
+    syncProjectFromForm();
+  }
+
+  function persistPreviewDraft() {
+    syncCurrentEditor();
+    sessionStorage.setItem(previewDraftKey, JSON.stringify({
+      savedAt: Date.now(),
+      data: contentData,
+    }));
+  }
+
+  function setMode(mode) {
+    activeMode = mode;
+    const editingLinks = mode === "links";
+    const editingProfile = mode === "profile";
+    const editingProjects = mode === "projects";
+    elements.projectSelectWrap.hidden = !editingProjects;
+    elements.projectEditor.hidden = !editingProjects;
+    elements.profileEditor.hidden = !editingProfile;
+    elements.linksEditor.hidden = !editingLinks;
+
+    if (editingLinks) {
+      fillSiteLinks();
+      refreshPreviewHref();
+      return;
+    }
+    if (editingProfile) {
+      fillProfile();
+      refreshPreviewHref();
+      return;
+    }
+    fillProject(getSelectedProject() || contentData.projects[0]);
   }
 
   function renderProjectOptions() {
@@ -149,7 +289,6 @@
     const initial = contentData.projects.find((project) => project.id === requestedId)
       || contentData.projects[0];
     if (initial) {
-      elements.select.value = initial.id;
       fillProject(initial);
     }
   }
@@ -169,18 +308,44 @@
     return btoa(binary);
   }
 
+  function hydrateEditors() {
+    renderProjectOptions();
+    fillSiteLinks();
+    fillProfile();
+    setMode(elements.mode.value);
+  }
+
   function loadLocalData() {
     return fetch(`${dataPath}?v=${Date.now()}`, { cache: "no-store" })
       .then((response) => {
-        if (!response.ok) throw new Error("无法读取本地数据");
+        if (!response.ok) throw new Error("无法读取本地数据。");
         return response.json();
       })
       .then((data) => {
-        contentData = data;
-        renderProjectOptions();
-        fillSiteLinks();
-        setMode(elements.mode.value);
+        normalizeContentData(data);
+        hydrateEditors();
         setStatus("已读取本地内容。粘贴 GitHub Token 后可以保存到仓库。");
+      });
+  }
+
+  function verifyOwnerToken(token) {
+    return fetch("https://api.github.com/user", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+      },
+    })
+      .then((response) => {
+        if (response.ok) return response.json();
+        if (response.status === 403) return null;
+        throw new Error("Token 无法验证 GitHub 账号。");
+      })
+      .then((user) => {
+        if (!user) return;
+        if ((user.login || "").toLowerCase() !== repoOwner.toLowerCase()) {
+          throw new Error(`当前 Token 属于 ${user.login || "未知账号"}，只有 ${repoOwner} 可以保存。`);
+        }
       });
   }
 
@@ -199,10 +364,9 @@
       })
       .then((file) => {
         fileSha = file.sha;
-        contentData = JSON.parse(decodeBase64Utf8(file.content));
-        renderProjectOptions();
-        fillSiteLinks();
-        setMode(elements.mode.value);
+        normalizeContentData(JSON.parse(decodeBase64Utf8(file.content)));
+        hydrateEditors();
+        elements.loginState.textContent = "已登录：当前 Token 属于 KuaiLeBozi，可以保存内容。";
         setStatus("已连接 GitHub，当前内容来自远程仓库。");
       });
   }
@@ -224,25 +388,6 @@
       });
   }
 
-  function verifyOwnerToken(token) {
-    return fetch("https://api.github.com/user", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28",
-      },
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error("Token 无法验证 GitHub 账号。");
-        return response.json();
-      })
-      .then((user) => {
-        if ((user.login || "").toLowerCase() !== repoOwner.toLowerCase()) {
-          throw new Error(`当前 Token 属于 ${user.login || "未知账号"}，只有 ${repoOwner} 可以保存。`);
-        }
-      });
-  }
-
   function saveRemoteData(token) {
     return verifyOwnerToken(token)
       .then(() => {
@@ -251,7 +396,7 @@
       })
       .then(() => {
         const body = {
-          message: "Update project content from admin page",
+          message: "Update site content from admin page",
           content: encodeBase64Utf8(`${JSON.stringify(contentData, null, 2)}\n`),
           branch,
         };
@@ -280,8 +425,25 @@
       });
   }
 
-  function updateCursor(event) {
-    elements.cursor.style.transform = `translate(${event.clientX}px, ${event.clientY}px)`;
+  function connectGitHub() {
+    const token = elements.token.value.trim();
+    if (!token) {
+      elements.loginState.textContent = "未登录：请先粘贴 GitHub Token。";
+      setStatus("请先粘贴 GitHub Token。", true);
+      return;
+    }
+
+    elements.loginButton.disabled = true;
+    elements.loginState.textContent = "连接中：正在验证账号和仓库权限...";
+    setStatus("正在连接 GitHub。");
+    loadRemoteData(token)
+      .catch((error) => {
+        elements.loginState.textContent = "未登录：Token 验证失败。";
+        setStatus(error.message, true);
+      })
+      .finally(() => {
+        elements.loginButton.disabled = false;
+      });
   }
 
   function createForwardedMouseEvent(type, sourceEvent, options = {}) {
@@ -333,17 +495,30 @@
     }
   }
 
-  elements.token.addEventListener("change", () => {
-    const token = elements.token.value.trim();
-    if (!token) return;
-    setStatus("正在连接 GitHub。");
-    loadRemoteData(token).catch((error) => setStatus(error.message, true));
+  elements.loginButton.addEventListener("click", connectGitHub);
+  elements.token.addEventListener("change", connectGitHub);
+
+  elements.mode.addEventListener("change", () => {
+    syncCurrentEditor();
+    setMode(elements.mode.value);
+    persistPreviewDraft();
+    setStatus("已临时保存当前编辑内容。");
   });
 
-  elements.mode.addEventListener("change", () => setMode(elements.mode.value));
   elements.select.addEventListener("change", () => {
+    syncProjectFromForm();
     fillProject(getSelectedProject());
-    elements.preview.href = `project.html?id=${encodeURIComponent(elements.select.value)}`;
+    persistPreviewDraft();
+    setStatus("已临时保存上一个项目的编辑内容。");
+  });
+
+  elements.preview.addEventListener("click", () => {
+    persistPreviewDraft();
+    refreshPreviewHref();
+  });
+
+  elements.form.addEventListener("input", () => {
+    persistPreviewDraft();
   });
 
   elements.form.addEventListener("submit", (event) => {
@@ -353,16 +528,17 @@
       setStatus("请先粘贴 GitHub Token。", true);
       return;
     }
-    if (elements.mode.value === "links") {
-      syncLinksFromForm();
-    } else {
-      syncProjectFromForm();
-    }
+    syncCurrentEditor();
+    persistPreviewDraft();
     setStatus("正在保存到 GitHub。");
-    saveRemoteData(token).catch((error) => setStatus(error.message, true));
+    elements.save.disabled = true;
+    saveRemoteData(token)
+      .catch((error) => setStatus(error.message, true))
+      .finally(() => {
+        elements.save.disabled = false;
+      });
   });
 
-  document.addEventListener("pointermove", updateCursor);
   document.addEventListener("pointerdown", forwardLiveBackgroundPointer, true);
   document.addEventListener("pointermove", forwardLiveBackgroundPointer, true);
   document.addEventListener("pointerup", forwardLiveBackgroundPointer, true);

@@ -7,13 +7,13 @@
     <title>KuaileBozi</title>
     <link rel="icon" type="image/png" sizes="32x32" href="assets/media/favicon-32.png?v=icon-2" />
     <link rel="apple-touch-icon" href="assets/media/apple-touch-icon.png?v=icon-2" />
-    <link rel="stylesheet" href="assets/css/styles.css?v=clean-1" />
+    <link rel="stylesheet" href="assets/css/styles.css?v=blog-1" />
   </head>
   <body class="has-entered admin-page">
     <iframe
       class="live-background"
       id="liveBackground"
-      src="assets/live-bg/index.html?v=clean-1"
+      src="assets/live-bg/index.html?v=blog-1"
       title=""
       tabindex="-1"
       aria-hidden="true"
@@ -38,17 +38,17 @@
 
         <nav class="nav-links" aria-label="编辑页操作">
           <a class="nav-tab" href="index.html">首页</a>
-          <a class="nav-tab is-active" href="admin.html">编辑</a>
-          <a class="nav-tab" id="previewLink" href="project.html?id=diffusion">预览</a>
+          <a class="nav-tab is-active" href="admin.html">管理</a>
+          <a class="nav-tab" id="previewLink" href="index.html?panel=projects">预览</a>
         </nav>
       </header>
 
       <section class="admin-layout">
         <article class="hero panel admin-hero">
           <p class="eyebrow">GitHub Contents API / Owner Edit</p>
-          <h1>项目内容编辑</h1>
+          <h1>内容管理台</h1>
           <p>
-            使用你的 GitHub Token 保存内容到仓库，访客只能查看页面，不能保存修改。
+            登录后可以用更像写 Blog 的方式维护文章、个人信息和联系方式，并保存到 GitHub 仓库。
           </p>
         </article>
 
@@ -58,12 +58,17 @@
               GitHub Token
               <input id="githubToken" type="password" autocomplete="off" placeholder="粘贴 fine-grained token 或 classic token" />
             </label>
+            <div class="admin-login-bar">
+              <span id="loginState">未登录：粘贴 Token 后可连接 GitHub。</span>
+              <button class="action-link" id="loginButton" type="button">连接 GitHub</button>
+            </div>
 
             <div class="admin-row">
               <label>
                 内容类型
                 <select id="contentMode">
-                  <option value="projects">课题详情</option>
+                  <option value="projects">Blog 文章</option>
+                  <option value="profile">主页文字</option>
                   <option value="links">联系与传送门</option>
                 </select>
               </label>
@@ -76,7 +81,7 @@
 
             <div class="project-editor" id="projectEditor">
             <label>
-              标题
+              Blog 标题
               <input id="projectTitleInput" type="text" />
             </label>
 
@@ -107,7 +112,7 @@
 
             <label>
               正文区块
-              <textarea id="projectSectionsInput" rows="10" placeholder="每个区块用空行分隔。第一行是小标题，后面是正文。"></textarea>
+              <textarea id="projectSectionsInput" rows="12" placeholder="像写日记/Blog 一样写。每个区块用空行分隔，第一行是小标题，后面是正文。"></textarea>
             </label>
 
             <label>
@@ -116,10 +121,45 @@
             </label>
             </div>
 
+            <div class="profile-editor" id="profileEditor" hidden>
+              <label>
+                首页眉标
+                <input id="profileEyebrowInput" type="text" />
+              </label>
+              <label>
+                欢迎标题
+                <input id="profileTitleInput" type="text" />
+              </label>
+              <label>
+                首页简介
+                <textarea id="profileBioInput" rows="3"></textarea>
+              </label>
+              <label>
+                档案名
+                <input id="profileNameInput" type="text" />
+              </label>
+              <label>
+                个人介绍
+                <textarea id="profileAboutInput" rows="5"></textarea>
+              </label>
+              <label>
+                当前状态标题
+                <input id="profileNowTitleInput" type="text" />
+              </label>
+              <label>
+                当前状态正文
+                <textarea id="profileNowInput" rows="4"></textarea>
+              </label>
+              <label>
+                档案字段
+                <textarea id="profileFactsInput" rows="6" placeholder="每行一个字段：标题 | 内容"></textarea>
+              </label>
+            </div>
+
             <div class="links-editor" id="linksEditor" hidden>
               <label>
                 联系与传送门
-                <textarea id="siteLinksInput" rows="8" placeholder="每行一个链接：标题 | https://example.com"></textarea>
+                <textarea id="siteLinksInput" rows="8" placeholder="每行一个联系方式：标题 | 值 | 展示文本，例如 QQ | 2406659686 | QQ: 2406659686"></textarea>
               </label>
             </div>
 
@@ -129,7 +169,7 @@
       </section>
     </main>
 
-    <script defer src="assets/js/global-ui.js?v=clean-1"></script>
-    <script defer src="assets/js/admin.js?v=clean-1"></script>
+    <script defer src="assets/js/global-ui.js?v=blog-1"></script>
+    <script defer src="assets/js/admin.js?v=blog-1"></script>
   </body>
 </html>
