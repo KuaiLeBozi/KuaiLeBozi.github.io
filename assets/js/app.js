@@ -10,14 +10,23 @@
     trackIndex: 0,
     muted: false,
     lobbySwitched: false,
+    lobbyVideoUrls: {},
     audio: new Audio(),
   };
+  const backgroundVideos = [
+    "assets/media/CH0295_home_Start_Idle_01.webm",
+    "assets/media/CH0295_home_Idle_01.webm",
+  ];
+  const videoCacheName = "kuailebozi-background-videos-v1";
+  const videoDbName = "kuailebozi-background-videos";
+  const videoStoreName = "videos";
 
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
   const elements = {
     memoryLobby: $("#memoryLobby"),
+    memoryLobbyIdle: $("#memoryLobbyIdle"),
     entryGate: $("#entryGate"),
     enterButton: $("#enterButton"),
     player: $("#player"),
@@ -32,10 +41,6 @@
     heroActions: $("#heroActions"),
     loadingProgress: $("#loadingProgress"),
     loadingLabel: $("#loadingLabel"),
-    opacityControl: $("#opacityControl"),
-    opacityToggle: $("#opacityToggle"),
-    opacityRange: $("#opacityRange"),
-    opacityValue: $("#opacityValue"),
     profileName: $("#profileName"),
     profileText: $("#profileText"),
     factList: $("#factList"),
@@ -176,66 +181,222 @@
     elements.enterButton.querySelector("small").textContent = "进入基沃托斯";
   }
 
-  function getLobbyBufferedRatio() {
-    const video = elements.memoryLobby;
-    if (!video.duration || !Number.isFinite(video.duration) || video.duration <= 0) {
-      return video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA ? 0.35 : 0;
-    }
-    if (!video.buffered.length) return 0;
-    const bufferedEnd = video.buffered.end(video.buffered.length - 1);
-    return Math.min(bufferedEnd / video.duration, 1);
-  }
-
   function updateLoadingProgress(ratio) {
     const progress = Math.max(0, Math.min(ratio, 1));
     elements.loadingProgress.style.transform = `scaleX(${progress})`;
     elements.loadingLabel.textContent = `Loading ${Math.round(progress * 100)}%`;
   }
 
-  function enterWhenLobbyReady() {
-    let visualProgress = 0;
-    updateLoadingProgress(0);
+  async function readResponseAsBlob(response, onProgress) {
+    const total = Number(response.headers.get("content-length")) || 0;
+    const reader = response.body && response.body.getReader ? response.body.getReader() : null;
 
-    const timer = window.setInterval(() => {
-      const buffered = getLobbyBufferedRatio();
-      visualProgress = Math.max(visualProgress + 0.012, buffered * 0.92);
-      updateLoadingProgress(Math.min(visualProgress, 0.98));
-      if (isLobbyInitialized()) {
-        finish();
+    if (!reader) {
+      const blob = await response.blob();
+      onProgress(1);
+      return blob;
+    }
+
+    const chunks = [];
+    let received = 0;
+
+    while (true) {
+      const result = await reader.read();
+      if (result.done) break;
+      chunks.push(result.value);
+      received += result.value.byteLength;
+      if (total > 0) {
+        onProgress(received / total);
       }
-    }, 80);
+    }
+
+    onProgress(1);
+    return new Blob(chunks, {
+      type: response.headers.get("content-type") || "video/webm",
+    });
+  }
+
+  function openVideoDb() {
+    if (!("indexedDB" in window)) {
+      return Promise.resolve(null);
+    }
+
+    return new Promise((resolve) => {
+      const request = indexedDB.open(videoDbName, 1);
+
+      request.onupgradeneeded = () => {
+        const db = request.result;
+        if (!db.objectStoreNames.contains(videoStoreName)) {
+          db.createObjectStore(videoStoreName);
+        }
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => resolve(null);
+      request.onblocked = () => resolve(null);
+    });
+  }
+
+  async function getVideoFromIndexedDb(src) {
+    const db = await openVideoDb();
+    if (!db) return null;
+
+    return new Promise((resolve) => {
+      const transaction = db.transaction(videoStoreName, "readonly");
+      const store = transaction.objectStore(videoStoreName);
+      const request = store.get(src);
+
+      request.onsuccess = () => resolve(request.result || null);
+      request.onerror = () => resolve(null);
+      transaction.oncomplete = () => db.close();
+      transaction.onerror = () => db.close();
+    });
+  }
+
+  async function putVideoInIndexedDb(src, blob) {
+    const db = await openVideoDb();
+    if (!db) return;
+
+    await new Promise((resolve) => {
+      const transaction = db.transaction(videoStoreName, "readwrite");
+      const store = transaction.objectStore(videoStoreName);
+      store.put(blob, src);
+      transaction.oncomplete = () => {
+        db.close();
+        resolve();
+      };
+      transaction.onerror = () => {
+        db.close();
+        resolve();
+      };
+    });
+  }
+
+  async function loadCachedVideo(src, onProgress) {
+    let cache = null;
+    let cached = null;
+
+    try {
+      cache = "caches" in window ? await caches.open(videoCacheName) : null;
+      cached = cache ? await cache.match(src) : null;
+    } catch (_) {
+      cache = null;
+      cached = null;
+    }
+
+    if (cached) {
+      const blob = await cached.blob();
+      onProgress(1);
+      return URL.createObjectURL(blob);
+    }
+
+    const indexedDbBlob = await getVideoFromIndexedDb(src);
+    if (indexedDbBlob) {
+      onProgress(1);
+      return URL.createObjectURL(indexedDbBlob);
+    }
+
+    const response = await fetch(src, { cache: "force-cache" });
+    if (!response.ok) {
+      throw new Error(`Unable to cache video: ${src}`);
+    }
+
+    const blob = await readResponseAsBlob(response, onProgress);
+    if (cache) {
+      try {
+        await cache.put(src, new Response(blob, { headers: { "content-type": blob.type } }));
+      } catch (_) {
+        // Some embedded browsers expose Cache Storage but reject large media writes.
+      }
+    }
+    await putVideoInIndexedDb(src, blob);
+    return URL.createObjectURL(blob);
+  }
+
+  async function cacheLobbyVideos() {
+    const progressByVideo = new Map(backgroundVideos.map((src) => [src, 0]));
+    const updateTotalProgress = (src, ratio) => {
+      progressByVideo.set(src, Math.max(0, Math.min(ratio, 1)));
+      const total = Array.from(progressByVideo.values()).reduce((sum, value) => sum + value, 0);
+      updateLoadingProgress(total / backgroundVideos.length);
+    };
+
+    const cachedUrls = await Promise.all(
+      backgroundVideos.map((src) => loadCachedVideo(src, (ratio) => updateTotalProgress(src, ratio)))
+    );
+
+    backgroundVideos.forEach((src, index) => {
+      state.lobbyVideoUrls[src] = cachedUrls[index];
+    });
+  }
+
+  function waitForVideoReady(video) {
+    if (video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+      return Promise.resolve();
+    }
+
+    return new Promise((resolve, reject) => {
+      const cleanup = () => {
+        video.removeEventListener("canplay", handleReady);
+        video.removeEventListener("loadeddata", handleReady);
+        video.removeEventListener("error", handleError);
+      };
+      const handleReady = () => {
+        cleanup();
+        resolve();
+      };
+      const handleError = () => {
+        cleanup();
+        reject(new Error("Lobby video failed to decode."));
+      };
+
+      video.addEventListener("canplay", handleReady, { once: true });
+      video.addEventListener("loadeddata", handleReady, { once: true });
+      video.addEventListener("error", handleError, { once: true });
+      video.load();
+    });
+  }
+
+  async function warmVideo(video) {
+    await video.play().catch(() => {});
+    video.pause();
+    try {
+      video.currentTime = 0;
+    } catch (_) {
+      // Some media containers do not allow precise seeks before the first visible play.
+    }
+  }
+
+  async function enterWhenLobbyReady() {
+    updateLoadingProgress(0);
 
     const finish = () => {
       if (state.entered) return;
-      window.clearInterval(timer);
       updateLoadingProgress(1);
       elements.loadingLabel.textContent = "Ready";
       enableEnterButton();
     };
 
-    function isLobbyInitialized() {
-      return (
-        elements.memoryLobby.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA ||
-        getLobbyBufferedRatio() >= 0.88
-      );
+    try {
+      await cacheLobbyVideos();
+      elements.memoryLobby.src = state.lobbyVideoUrls[backgroundVideos[0]];
+      elements.memoryLobbyIdle.src = state.lobbyVideoUrls[backgroundVideos[1]];
+      elements.memoryLobby.load();
+      elements.memoryLobbyIdle.load();
+      await Promise.all([
+        waitForVideoReady(elements.memoryLobby),
+        waitForVideoReady(elements.memoryLobbyIdle),
+      ]);
+      await warmVideo(elements.memoryLobbyIdle);
+      await elements.memoryLobby.play().catch(() => {});
+      finish();
+    } catch (_) {
+      elements.memoryLobby.src = backgroundVideos[0];
+      elements.memoryLobbyIdle.src = backgroundVideos[1];
+      elements.memoryLobby.load();
+      elements.memoryLobbyIdle.load();
+      elements.memoryLobby.play().catch(() => {});
+      finish();
     }
-
-    if (isLobbyInitialized()) {
-      window.setTimeout(finish, 250);
-      return;
-    }
-
-    const fallback = window.setTimeout(finish, 9000);
-    elements.memoryLobby.addEventListener(
-      "canplaythrough",
-      () => {
-        window.clearTimeout(fallback);
-        window.setTimeout(finish, 250);
-      },
-      { once: true }
-    );
-    elements.memoryLobby.load();
-    elements.memoryLobby.play().catch(() => {});
   }
 
   function togglePlay() {
@@ -271,35 +432,6 @@
     elements.customCursor.style.transform = `translate(${event.clientX}px, ${event.clientY}px)`;
   }
 
-  function applyOpacity(value) {
-    const opacity = Math.max(25, Math.min(Number(value) || 46, 90));
-    const normalized = opacity / 100;
-    document.documentElement.style.setProperty("--panel-alpha", normalized.toFixed(2));
-    document.documentElement.style.setProperty("--panel-strong-alpha", Math.min(normalized + 0.16, 0.96).toFixed(2));
-    document.documentElement.style.setProperty("--topbar-alpha", Math.max(normalized - 0.12, 0.18).toFixed(2));
-    elements.opacityRange.value = String(opacity);
-    elements.opacityValue.textContent = `${opacity}%`;
-    try {
-      localStorage.setItem("kuai-panel-opacity", String(opacity));
-    } catch (_) {
-      // Storage can be unavailable in strict privacy modes; the live control still works.
-    }
-  }
-
-  function initOpacityControl() {
-    let saved = elements.opacityRange.value;
-    try {
-      saved = localStorage.getItem("kuai-panel-opacity") || saved;
-    } catch (_) {
-      // Keep the default when storage is unavailable.
-    }
-    applyOpacity(saved);
-    elements.opacityToggle.addEventListener("click", () => {
-      elements.opacityControl.classList.toggle("is-open");
-    });
-    elements.opacityRange.addEventListener("input", () => applyOpacity(elements.opacityRange.value));
-  }
-
   function bindEvents() {
     elements.enterButton.addEventListener("click", autoEnterSite);
     elements.playPauseButton.addEventListener("click", togglePlay);
@@ -332,15 +464,14 @@
           : elements.memoryLobby.ended;
       if (!hasEndedNaturally) return;
       state.lobbySwitched = true;
-      elements.memoryLobby.src = "assets/media/CH0295_home_Idle_01.webm";
-      elements.memoryLobby.loop = true;
-      elements.memoryLobby.play().catch(() => {});
+      elements.memoryLobby.classList.remove("is-visible");
+      elements.memoryLobbyIdle.classList.add("is-visible");
+      elements.memoryLobbyIdle.play().catch(() => {});
     });
   }
 
   renderContent();
   loadTrack(0, false);
-  initOpacityControl();
   bindEvents();
   enterWhenLobbyReady();
   }

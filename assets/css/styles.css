@@ -8,9 +8,9 @@
   --yellow: #ffe27a;
   --ink: #172b4f;
   --muted: #607292;
-  --panel-alpha: 0.46;
-  --panel-strong-alpha: 0.62;
-  --topbar-alpha: 0.34;
+  --panel-alpha: 0.1;
+  --panel-strong-alpha: 0.1;
+  --topbar-alpha: 0.1;
   --paper: rgba(255, 255, 255, var(--panel-alpha));
   --paper-strong: rgba(255, 255, 255, var(--panel-strong-alpha));
   --line: rgba(71, 176, 255, 0.36);
@@ -54,7 +54,12 @@ a {
   height: 100%;
   object-fit: cover;
   z-index: -5;
+  opacity: 0;
   background: #dff5ff;
+}
+
+.memory-lobby.is-visible {
+  opacity: 1;
 }
 
 .scene-overlay {
@@ -645,57 +650,6 @@ a {
   transform: translateY(0);
 }
 
-.opacity-control {
-  position: fixed;
-  left: 22px;
-  bottom: 22px;
-  z-index: 7;
-  display: flex;
-  align-items: flex-end;
-  gap: 10px;
-}
-
-.opacity-toggle {
-  min-height: 42px;
-  padding: 10px 14px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  color: white;
-  font-weight: 900;
-  background: linear-gradient(135deg, var(--blue-500), var(--blue-700));
-  box-shadow: var(--shadow);
-}
-
-.opacity-panel {
-  display: grid;
-  grid-template-columns: auto 140px auto;
-  align-items: center;
-  gap: 10px;
-  min-height: 42px;
-  padding: 10px 12px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  color: var(--blue-900);
-  font-weight: 900;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateX(-8px);
-  background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(12px);
-  box-shadow: var(--shadow);
-  transition: opacity 180ms ease, transform 180ms ease;
-}
-
-.opacity-control.is-open .opacity-panel {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateX(0);
-}
-
-.opacity-panel input {
-  accent-color: var(--blue-500);
-}
-
 .icon-button {
   display: grid;
   place-items: center;
@@ -804,18 +758,6 @@ a {
 
   .player {
     bottom: 12px;
-  }
-
-  .opacity-control {
-    left: 12px;
-    bottom: 78px;
-    align-items: flex-start;
-    flex-direction: column-reverse;
-  }
-
-  .opacity-panel {
-    grid-template-columns: 1fr;
-    width: min(240px, calc(100vw - 24px));
   }
 
   .track-meta strong {

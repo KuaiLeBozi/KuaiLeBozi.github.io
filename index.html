@@ -10,16 +10,24 @@
     <title>KuaiLeBozi | 蔚蓝档案风格主页</title>
     <link rel="icon" type="image/png" href="assets/media/CH0070_Halo.png?v=click-1080-1" />
     <link rel="apple-touch-icon" href="assets/media/CH0070_Halo.png?v=click-1080-1" />
-    <link rel="stylesheet" href="assets/css/styles.css?v=click-1080-1" />
+    <link rel="stylesheet" href="assets/css/styles.css?v=bg-cache-1" />
   </head>
   <body>
     <video
-      class="memory-lobby"
+      class="memory-lobby is-visible"
       id="memoryLobby"
-      src="assets/media/CH0295_home_Start_Idle_01.webm"
       autoplay
       muted
       playsinline
+      preload="auto"
+      aria-hidden="true"
+    ></video>
+    <video
+      class="memory-lobby"
+      id="memoryLobbyIdle"
+      muted
+      playsinline
+      loop
       preload="auto"
       aria-hidden="true"
     ></video>
@@ -126,20 +134,11 @@
       </div>
     </div>
 
-    <div class="opacity-control" id="opacityControl" aria-label="界面透明度设置">
-      <button class="opacity-toggle" id="opacityToggle" type="button">透明度</button>
-      <label class="opacity-panel" for="opacityRange">
-        <span>界面透明度</span>
-        <input id="opacityRange" type="range" min="25" max="90" value="46" />
-        <strong id="opacityValue">46%</strong>
-      </label>
-    </div>
-
     <noscript>
       <p class="noscript">请启用 JavaScript 以加载音乐控制与个人档案内容。</p>
     </noscript>
 
     <script defer src="assets/js/site-config.js?v=click-1080-1"></script>
-    <script defer src="assets/js/app.js?v=click-1080-1"></script>
+    <script defer src="assets/js/app.js?v=bg-cache-1"></script>
   </body>
 </html>
