@@ -19,6 +19,7 @@
   const elements = {
     memoryLobby: $("#memoryLobby"),
     entryGate: $("#entryGate"),
+    enterButton: $("#enterButton"),
     player: $("#player"),
     playPauseButton: $("#playPauseButton"),
     nextButton: $("#nextButton"),
@@ -165,6 +166,12 @@
     loadTrack(0, true);
   }
 
+  function enableEnterButton() {
+    elements.enterButton.disabled = false;
+    elements.enterButton.classList.add("is-ready");
+    elements.enterButton.querySelector("small").textContent = "进入基沃托斯";
+  }
+
   function getLobbyBufferedRatio() {
     const video = elements.memoryLobby;
     if (!video.duration || !Number.isFinite(video.duration) || video.duration <= 0) {
@@ -198,7 +205,8 @@
       if (state.entered) return;
       window.clearInterval(timer);
       updateLoadingProgress(1);
-      window.setTimeout(autoEnterSite, 280);
+      elements.loadingLabel.textContent = "Ready";
+      enableEnterButton();
     };
 
     function isLobbyInitialized() {
@@ -260,6 +268,7 @@
   }
 
   function bindEvents() {
+    elements.enterButton.addEventListener("click", autoEnterSite);
     elements.playPauseButton.addEventListener("click", togglePlay);
     elements.nextButton.addEventListener("click", nextTrack);
     elements.muteButton.addEventListener("click", toggleMute);
