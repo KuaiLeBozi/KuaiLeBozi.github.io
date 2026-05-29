@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="kuailebozi personal homepage, Blue Archive inspired static GitHub Pages site."
+    />
+    <title>kuailebozi | Blue Archive Style Home</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+  </head>
+  <body>
+    <video
+      class="memory-lobby"
+      src="assets/media/CH0295_home_Idle_01.webm"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="auto"
+      aria-hidden="true"
+    ></video>
+
+    <div class="scene-overlay" aria-hidden="true"></div>
+    <div class="hud-grid" aria-hidden="true"></div>
+
+    <main class="site-shell" id="app">
+      <section class="entry-gate" id="entryGate" aria-labelledby="entryTitle">
+        <div class="entry-mark">
+          <span class="entry-kicker">Schale Personal Terminal</span>
+          <h1 id="entryTitle">Kuailebozi</h1>
+          <p>Blue Archive inspired homepage</p>
+        </div>
+        <button class="enter-button" id="enterButton" type="button">
+          <span>Enter</span>
+        </button>
+      </section>
+
+      <section class="dashboard" id="dashboard" aria-label="Personal homepage">
+        <header class="topbar">
+          <a class="brand" href="#home" aria-label="Back to home">
+            <span class="brand-symbol">K</span>
+            <span>
+              <strong>Kuailebozi</strong>
+              <small>Github Pages</small>
+            </span>
+          </a>
+
+          <nav class="nav-links" aria-label="Page sections">
+            <a href="#profile">Profile</a>
+            <a href="#projects">Projects</a>
+            <a href="#links">Links</a>
+          </nav>
+        </header>
+
+        <section class="hero" id="home">
+          <div class="hero-copy panel">
+            <p class="eyebrow" id="heroEyebrow">Loading terminal...</p>
+            <h2 id="heroTitle">Welcome</h2>
+            <p id="heroBio"></p>
+            <div class="hero-actions" id="heroActions"></div>
+          </div>
+
+          <aside class="status-panel panel" aria-label="Status">
+            <div>
+              <span class="panel-label">Current BGM</span>
+              <strong id="statusTrack">Hello to Halo</strong>
+            </div>
+            <div>
+              <span class="panel-label">Mode</span>
+              <strong>Memory Lobby</strong>
+            </div>
+            <div>
+              <span class="panel-label">Build</span>
+              <strong>Static Pages</strong>
+            </div>
+          </aside>
+        </section>
+
+        <section class="content-grid" id="profile">
+          <article class="profile-card panel">
+            <span class="panel-label">Profile</span>
+            <h3 id="profileName"></h3>
+            <p id="profileText"></p>
+            <dl class="fact-list" id="factList"></dl>
+          </article>
+
+          <article class="profile-card panel">
+            <span class="panel-label">Now</span>
+            <h3 id="nowTitle"></h3>
+            <p id="nowText"></p>
+          </article>
+        </section>
+
+        <section class="projects" id="projects" aria-labelledby="projectsTitle">
+          <div class="section-heading">
+            <span class="panel-label">Archive</span>
+            <h3 id="projectsTitle">Projects</h3>
+          </div>
+          <div class="project-grid" id="projectGrid"></div>
+        </section>
+
+        <section class="links panel" id="links" aria-labelledby="linksTitle">
+          <div>
+            <span class="panel-label">Contact</span>
+            <h3 id="linksTitle">Find me here</h3>
+          </div>
+          <div class="link-list" id="linkList"></div>
+        </section>
+      </section>
+    </main>
+
+    <div class="player" id="player" aria-label="Music player">
+      <button class="icon-button" id="playPauseButton" type="button" aria-label="Pause music">
+        <span aria-hidden="true">II</span>
+      </button>
+      <button class="icon-button" id="nextButton" type="button" aria-label="Next track">
+        <span aria-hidden="true">&gt;</span>
+      </button>
+      <button class="icon-button" id="muteButton" type="button" aria-label="Mute music">
+        <span aria-hidden="true">M</span>
+      </button>
+      <div class="track-meta">
+        <span>Now Playing</span>
+        <strong id="trackTitle">Hello to Halo</strong>
+      </div>
+    </div>
+
+    <noscript>
+      <p class="noscript">Please enable JavaScript to use the music controls and profile content.</p>
+    </noscript>
+
+    <script src="assets/js/site-config.js"></script>
+    <script src="assets/js/app.js"></script>
+  </body>
+</html>
