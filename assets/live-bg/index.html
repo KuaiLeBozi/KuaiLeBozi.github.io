@@ -4,24 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dynamic Background</title>
-    <link rel="stylesheet" href="./assets/live-background.css?v=mobile-fit-4" />
+    <link rel="stylesheet" href="./assets/live-background.css?v=mobile-reset-1" />
     <style>
-      html,
-      body,
-      #app {
-        width: 100%;
-        min-height: 100vh;
-        min-height: 100dvh;
-        min-height: calc(100lvh + 260px);
-        background: transparent !important;
-      }
-
-      canvas {
-        min-height: 100vh;
-        min-height: 100dvh;
-        min-height: calc(100lvh + 260px);
-      }
-
       .setting-button,
       .setting,
       #loading {
@@ -55,20 +39,8 @@
               const data = JSON.parse(this.responseText);
               const model = data.SettingModel;
 
-              const isPortrait = window.innerWidth <= 700 || window.innerHeight > window.innerWidth * 1.15;
-
               model.version = 9010;
               model.resolution = "2k";
-              if (isPortrait) {
-                const topBleed = 130;
-                const visibleHeight = Math.max(320, window.innerHeight - 260);
-                const viewWidth = window.visualViewport?.width || window.innerWidth;
-                const viewHeight = visibleHeight;
-                const mobileScale = Math.min(0.36, Math.max(0.28, Math.min(viewWidth / 1180, viewHeight / 2450)));
-                model.scale = Number(mobileScale.toFixed(3));
-                model.x = Math.round(viewWidth * 0.42);
-                model.y = Math.round(topBleed + viewHeight * 0.9);
-              }
               model.bgmVolume = 0;
               model.talkVolume = 0.82;
               model.panelDisplay = false;
@@ -159,6 +131,6 @@
         }
       })();
     </script>
-    <script type="module" src="./assets/live-background.js?v=mobile-fit-4"></script>
+    <script type="module" src="./assets/live-background.js?v=mobile-reset-1"></script>
   </body>
 </html>
