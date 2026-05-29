@@ -8,11 +8,26 @@
     "nowTitle": "正在实习与研究 diffusion",
     "now": "当前关注方向包括生成模型、网络空间安全、前端交互和一些个人实验项目。欢迎用 GitHub 账号在下方留言交流。>w<",
     "facts": [
-      ["Site", "KuaileBozi.github.io"],
-      ["School", "华中科技大学网络空间安全学院"],
-      ["Grade", "2024 级"],
-      ["Focus", "Diffusion / AI / Cybersecurity"],
-      ["Team", "华科七边形"]
+      [
+        "Site",
+        "KuaileBozi.github.io"
+      ],
+      [
+        "School",
+        "华中科技大学网络空间安全学院"
+      ],
+      [
+        "Grade",
+        "2024 级"
+      ],
+      [
+        "Focus",
+        "Diffusion / AI / Cybersecurity"
+      ],
+      [
+        "Team",
+        "华科七边形"
+      ]
     ]
   },
   "links": [
@@ -31,7 +46,7 @@
     {
       "id": "diffusion",
       "type": "Research",
-      "title": "loop transformer方向",
+      "title": "loop transformer",
       "summary": "围绕生成模型、图像生成与扩散模型实践做学习和实验记录，逐步沉淀可复现的小项目。",
       "status": "研究中",
       "updated": "2026-05-29",
@@ -53,7 +68,8 @@
       "links": [
         {
           "label": "返回 GitHub",
-          "url": "https://github.com/KuaiLeBozi"
+          "url": "https://github.com/KuaiLeBozi",
+          "description": "返回 GitHub: https://github.com/KuaiLeBozi"
         }
       ],
       "description": "围绕生成模型、图像生成与扩散模型实践做学习和实验记录，逐步沉淀可复现的小项目。"
