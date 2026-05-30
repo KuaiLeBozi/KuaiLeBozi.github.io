@@ -13,12 +13,19 @@
     <iframe
       class="live-background"
       id="liveBackground"
-      src="assets/live-bg/index.html?v=screen-auto-8"
+      data-src="assets/live-bg/index.html"
       title=""
       tabindex="-1"
       aria-hidden="true"
       loading="eager"
     ></iframe>
+    <script>
+      (() => {
+        const liveBackground = document.getElementById("liveBackground");
+        if (!liveBackground?.dataset.src) return;
+        liveBackground.src = `${liveBackground.dataset.src}?v=${Date.now()}`;
+      })();
+    </script>
 
     <div class="scene-overlay" aria-hidden="true"></div>
     <div class="hud-grid" aria-hidden="true"></div>

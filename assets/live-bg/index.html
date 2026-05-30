@@ -4,7 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dynamic Background</title>
-    <link rel="stylesheet" href="./assets/live-background.css?v=screen-auto-8" />
+    <script>
+      (() => {
+        const cacheVersion = new URLSearchParams(window.location.search).get("v") || Date.now().toString();
+        const style = document.createElement("link");
+        style.rel = "stylesheet";
+        style.href = `./assets/live-background.css?v=${encodeURIComponent(cacheVersion)}`;
+        document.head.appendChild(style);
+      })();
+    </script>
     <style>
       .setting-button,
       .setting,
@@ -216,6 +224,14 @@
         }
       })();
     </script>
-    <script type="module" src="./assets/live-background.js?v=screen-auto-8"></script>
+    <script>
+      (() => {
+        const cacheVersion = new URLSearchParams(window.location.search).get("v") || Date.now().toString();
+        const script = document.createElement("script");
+        script.type = "module";
+        script.src = `./assets/live-background.js?v=${encodeURIComponent(cacheVersion)}`;
+        document.body.appendChild(script);
+      })();
+    </script>
   </body>
 </html>
