@@ -26,8 +26,8 @@
     "EventInfos":  [
                        {
                            "BoneName":  "Belt_M",
-                           "Width":  1800,
-                           "Height":  1000,
+                           "Width":  4200,
+                           "Height":  3600,
                            "Animations":  [
                                               "Talk_01_M",
                                               "Talk_02_M",

@@ -497,6 +497,10 @@
 
     function handleLiveDialogMessage(event) {
       if (event.origin !== window.location.origin) return;
+      if (event.data?.source === "kuailebozi-live-branch") {
+        window.__LIVE_BG_BRANCH__ = event.data;
+        return;
+      }
       if (event.data?.source === "kuailebozi-live-ready") {
         state.backgroundReady = true;
         enableEnterButton();

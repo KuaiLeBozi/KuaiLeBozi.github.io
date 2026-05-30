@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dynamic Background</title>
-    <link rel="stylesheet" href="./assets/live-background.css?v=screen-auto-6" />
+    <link rel="stylesheet" href="./assets/live-background.css?v=screen-auto-8" />
     <style>
       .setting-button,
       .setting,
@@ -51,11 +51,16 @@
               const width = window.visualViewport?.width || window.innerWidth;
               const height = window.visualViewport?.height || window.innerHeight;
               const isCoarsePointer = window.matchMedia?.("(pointer: coarse)")?.matches || false;
-              const isMobile = width <= 700 && isCoarsePointer &&
-              window.matchMedia?.("(pointer: coarse)")?.matches;
+              const bodyTouch = data.EventInfos?.find((item) => item.BoneName === "Belt_M");
+              const isMobile = width <= 700 && isCoarsePointer;
               const isLaptop1080p = !isMobile && width <= 1920 && height <= 1080;
 
-              model.version = 9010;
+              if (bodyTouch) {
+                bodyTouch.Width = 4200;
+                bodyTouch.Height = 3600;
+              }
+
+              model.version = 9011;
               model.resolution = "8k";
 
               // 大屏/2K 默认不覆盖 x/y/scale，直接使用 loadJson.json 里的原始值。
@@ -78,6 +83,17 @@
                 model.x = Math.round(100 * fit + xOffset);
                 model.y = Math.round(900 * fit + yOffset);
               }
+
+              window.parent?.postMessage({
+                source: "kuailebozi-live-branch",
+                branch: isMobile ? "mobile" : isLaptop1080p ? "laptop1080p" : "desktop2k",
+                width,
+                height,
+                coarse: isCoarsePointer,
+                scale: model.scale,
+                x: model.x,
+                y: model.y,
+              }, window.location.origin);
 
               model.bgmVolume = 0;
               model.talkVolume = 0.82;
@@ -200,6 +216,6 @@
         }
       })();
     </script>
-    <script type="module" src="./assets/live-background.js?v=screen-auto-6"></script>
+    <script type="module" src="./assets/live-background.js?v=screen-auto-8"></script>
   </body>
 </html>
