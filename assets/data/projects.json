@@ -1,11 +1,11 @@
 {
   "profile": {
-    "eyebrow": "联邦搜查部 Schale / 个人档案",
+    "eyebrow": "沙勒 Schale / 个人档案",
     "title": "欢迎，老师。",
     "bio": "这里是 KuaileBozi 的个人主页，用来收纳项目、笔记、研究记录和一些正在进行的小实验。XWX",
     "name": "KuaileBozi",
-    "about": "华中科技大学网络空间安全学院 2024 级学生，目前在实习与探索 diffusion 等方向。华科七边形一员，努力把有趣的想法做成能跑起来的小东西。XWX",
-    "nowTitle": "正在实习与研究 diffusion",
+    "about": "华中科技大学网络空间安全学院 2024 级学生，目前在实习与探索 AI 等方向。努力把有趣的想法做成能跑起来的小东西。XWX",
+    "nowTitle": "正在实习与研究 loop transformer",
     "now": "当前关注方向包括生成模型、网络空间安全、前端交互和一些个人实验项目。欢迎用 GitHub 账号在下方留言交流。>w<",
     "facts": [
       [
@@ -26,7 +26,7 @@
       ],
       [
         "Team",
-        "华科七边形"
+        "莫有捏"
       ]
     ]
   },
@@ -76,9 +76,9 @@
     },
     {
       "id": "security",
-      "type": "Cybersecurity",
-      "title": "网安学习记录",
-      "summary": "整理网络空间安全课程、竞赛训练、工程实践与安全研究中的笔记和资料。",
+      "type": "learning notes",
+      "title": "学习记录",
+      "summary": "整理竞赛训练、工程实践与科学研究中的笔记和资料。",
       "status": "持续整理",
       "updated": "2026-05-29",
       "tags": [
