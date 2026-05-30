@@ -18,22 +18,8 @@
     profileEditor: $("#profileEditor"),
     linksEditor: $("#linksEditor"),
     select: $("#projectSelect"),
-    title: $("#projectTitleInput"),
-    type: $("#projectTypeInput"),
-    status: $("#projectStatusInput"),
-    updated: $("#projectUpdatedInput"),
-    summary: $("#projectSummaryInput"),
-    tags: $("#projectTagsInput"),
-    sections: $("#projectSectionsInput"),
-    links: $("#projectLinksInput"),
-    profileEyebrow: $("#profileEyebrowInput"),
-    profileTitle: $("#profileTitleInput"),
-    profileBio: $("#profileBioInput"),
-    profileName: $("#profileNameInput"),
-    profileAbout: $("#profileAboutInput"),
-    profileNowTitle: $("#profileNowTitleInput"),
-    profileNow: $("#profileNowInput"),
-    profileFacts: $("#profileFactsInput"),
+    projectMarkdown: $("#projectMarkdownInput"),
+    profileMarkdown: $("#profileMarkdownInput"),
     siteLinks: $("#siteLinksInput"),
     save: $("#saveProject"),
     message: $("#adminStatus"),
@@ -92,29 +78,15 @@
     return getProjectById(activeProjectId || elements.select.value);
   }
 
-  function sectionsToText(sections) {
+  function sectionsToMarkdown(sections) {
     return (sections || [])
-      .map((section) => `${section.heading || ""}\n${section.body || ""}`.trim())
+      .map((section) => `## ${section.heading || "未命名段落"}\n\n${section.body || ""}`.trim())
       .join("\n\n");
   }
 
-  function textToSections(text) {
-    return text
-      .split(/\n\s*\n/)
-      .map((block) => block.trim())
-      .filter(Boolean)
-      .map((block) => {
-        const lines = block.split(/\n/);
-        return {
-          heading: lines.shift().trim(),
-          body: lines.join("\n").trim(),
-        };
-      });
-  }
-
-  function linksToText(links) {
+  function linksToMarkdown(links) {
     return (links || [])
-      .map((link) => `${link.label || ""} | ${link.url || link.href || link.value || ""} | ${link.description || ""}`)
+      .map((link) => `- ${link.label || ""} | ${link.url || link.href || link.value || ""} | ${link.description || ""}`)
       .join("\n");
   }
 
@@ -122,6 +94,7 @@
     return text
       .split(/\n/)
       .map((line) => line.trim())
+      .map((line) => line.replace(/^[-*]\s+/, ""))
       .filter(Boolean)
       .map((line) => {
         const [label, value = "", ...descriptionParts] = line.split("|");
@@ -136,9 +109,9 @@
       .filter((link) => link.label && (link.url || link.value));
   }
 
-  function factsToText(facts) {
+  function factsToMarkdown(facts) {
     return (facts || [])
-      .map(([label, value]) => `${label || ""} | ${value || ""}`)
+      .map(([label, value]) => `- ${label || ""} | ${value || ""}`)
       .join("\n");
   }
 
@@ -146,12 +119,186 @@
     return text
       .split(/\n/)
       .map((line) => line.trim())
+      .map((line) => line.replace(/^[-*]\s+/, ""))
       .filter(Boolean)
       .map((line) => {
         const [label, ...valueParts] = line.split("|");
         return [label.trim(), valueParts.join("|").trim()];
       })
       .filter(([label, value]) => label && value);
+  }
+
+  function parseFrontMatter(markdown) {
+    const match = markdown.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/);
+    const meta = {};
+    let body = markdown;
+    if (match) {
+      match[1].split(/\n/).forEach((line) => {
+        const separator = line.indexOf(":");
+        if (separator < 0) return;
+        const key = line.slice(0, separator).trim();
+        const value = line.slice(separator + 1).trim();
+        if (key) meta[key] = value;
+      });
+      body = markdown.slice(match[0].length);
+    }
+    return { meta, body: body.trim() };
+  }
+
+  function frontMatterToMarkdown(meta) {
+    return [
+      "---",
+      ...Object.entries(meta).map(([key, value]) => `${key}: ${value || ""}`),
+      "---",
+    ].join("\n");
+  }
+
+  function splitMarkdownSections(markdown) {
+    const lines = markdown.split(/\n/);
+    const intro = [];
+    const sections = [];
+    let current = null;
+
+    lines.forEach((line) => {
+      const heading = line.match(/^##\s+(.+?)\s*$/);
+      if (heading) {
+        current = { heading: heading[1].trim(), body: [] };
+        sections.push(current);
+        return;
+      }
+      if (current) {
+        current.body.push(line);
+      } else {
+        intro.push(line);
+      }
+    });
+
+    return {
+      intro: intro.join("\n").trim(),
+      sections: sections.map((section) => ({
+        heading: section.heading,
+        body: section.body.join("\n").trim(),
+      })),
+    };
+  }
+
+  function extractTitle(markdown, fallback = "") {
+    const lines = markdown.split(/\n/);
+    const index = lines.findIndex((line) => /^#\s+/.test(line));
+    if (index < 0) return { title: fallback, body: markdown.trim() };
+    const title = lines[index].replace(/^#\s+/, "").trim();
+    lines.splice(index, 1);
+    return { title: title || fallback, body: lines.join("\n").trim() };
+  }
+
+  function projectToMarkdown(project) {
+    const meta = frontMatterToMarkdown({
+      id: project.id || "",
+      type: project.type || "",
+      status: project.status || "",
+      updated: project.updated || "",
+      tags: (project.tags || []).join(", "),
+    });
+    const summary = project.summary || project.description || "";
+    const links = linksToMarkdown(project.links);
+    return [
+      meta,
+      `# ${project.title || "未命名文章"}`,
+      summary,
+      sectionsToMarkdown(project.sections),
+      links ? `## Links\n\n${links}` : "",
+    ].filter(Boolean).join("\n\n");
+  }
+
+  function markdownToProject(markdown, fallbackProject) {
+    const { meta, body } = parseFrontMatter(markdown);
+    const { title, body: withoutTitle } = extractTitle(body, fallbackProject.title || "未命名文章");
+    const { intro, sections } = splitMarkdownSections(withoutTitle);
+    const normalSections = [];
+    let links = [];
+
+    sections.forEach((section) => {
+      if (section.heading.toLowerCase() === "links") {
+        links = textToLinks(section.body);
+        return;
+      }
+      normalSections.push(section);
+    });
+
+    const summary = intro.trim();
+    return {
+      ...fallbackProject,
+      id: meta.id || fallbackProject.id,
+      type: meta.type || fallbackProject.type || "Blog",
+      title,
+      summary,
+      description: summary,
+      status: meta.status || fallbackProject.status || "",
+      updated: meta.updated || fallbackProject.updated || "",
+      tags: (meta.tags || "")
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter(Boolean),
+      sections: normalSections,
+      links,
+    };
+  }
+
+  function profileToMarkdown(profile) {
+    return [
+      frontMatterToMarkdown({
+        eyebrow: profile.eyebrow || "",
+        name: profile.name || "",
+      }),
+      `# ${profile.title || ""}`,
+      profile.bio || "",
+      "## About",
+      profile.about || "",
+      "## Now",
+      `### ${profile.nowTitle || ""}`,
+      profile.now || "",
+      "## Facts",
+      factsToMarkdown(profile.facts),
+    ].filter(Boolean).join("\n\n");
+  }
+
+  function markdownToProfile(markdown) {
+    const { meta, body } = parseFrontMatter(markdown);
+    const { title, body: withoutTitle } = extractTitle(body, defaultProfile.title);
+    const { intro, sections } = splitMarkdownSections(withoutTitle);
+    const profile = {
+      eyebrow: meta.eyebrow || defaultProfile.eyebrow,
+      title,
+      bio: intro,
+      name: meta.name || defaultProfile.name,
+      about: "",
+      nowTitle: "",
+      now: "",
+      facts: [],
+    };
+
+    sections.forEach((section) => {
+      const key = section.heading.toLowerCase();
+      if (key === "about") {
+        profile.about = section.body;
+        return;
+      }
+      if (key === "now") {
+        const lines = section.body.split(/\n/);
+        const titleIndex = lines.findIndex((line) => /^###\s+/.test(line));
+        if (titleIndex >= 0) {
+          profile.nowTitle = lines[titleIndex].replace(/^###\s+/, "").trim();
+          lines.splice(titleIndex, 1);
+        }
+        profile.now = lines.join("\n").trim();
+        return;
+      }
+      if (key === "facts") {
+        profile.facts = textToFacts(section.body);
+      }
+    });
+
+    return profile;
   }
 
   function getPreviewHref(projectId = activeProjectId || elements.select.value) {
@@ -168,62 +315,28 @@
     if (!project) return;
     activeProjectId = project.id;
     elements.select.value = project.id;
-    elements.title.value = project.title || "";
-    elements.type.value = project.type || "";
-    elements.status.value = project.status || "";
-    elements.updated.value = project.updated || "";
-    elements.summary.value = project.summary || "";
-    elements.tags.value = (project.tags || []).join(", ");
-    elements.sections.value = sectionsToText(project.sections);
-    elements.links.value = linksToText(project.links);
+    elements.projectMarkdown.value = projectToMarkdown(project);
     refreshPreviewHref();
   }
 
   function fillProfile() {
     const profile = contentData.profile || defaultProfile;
-    elements.profileEyebrow.value = profile.eyebrow || "";
-    elements.profileTitle.value = profile.title || "";
-    elements.profileBio.value = profile.bio || "";
-    elements.profileName.value = profile.name || "";
-    elements.profileAbout.value = profile.about || "";
-    elements.profileNowTitle.value = profile.nowTitle || "";
-    elements.profileNow.value = profile.now || "";
-    elements.profileFacts.value = factsToText(profile.facts);
+    elements.profileMarkdown.value = profileToMarkdown(profile);
   }
 
   function fillSiteLinks() {
-    elements.siteLinks.value = linksToText(contentData.links);
+    elements.siteLinks.value = linksToMarkdown(contentData.links);
   }
 
   function syncProjectFromForm() {
     const project = getActiveProject();
     if (!project) return;
-    project.title = elements.title.value.trim();
-    project.type = elements.type.value.trim();
-    project.status = elements.status.value.trim();
-    project.updated = elements.updated.value;
-    project.summary = elements.summary.value.trim();
-    project.description = project.summary;
-    project.tags = elements.tags.value
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter(Boolean);
-    project.sections = textToSections(elements.sections.value);
-    project.links = textToLinks(elements.links.value);
+    Object.assign(project, markdownToProject(elements.projectMarkdown.value, project));
     refreshPreviewHref();
   }
 
   function syncProfileFromForm() {
-    contentData.profile = {
-      eyebrow: elements.profileEyebrow.value.trim(),
-      title: elements.profileTitle.value.trim(),
-      bio: elements.profileBio.value.trim(),
-      name: elements.profileName.value.trim(),
-      about: elements.profileAbout.value.trim(),
-      nowTitle: elements.profileNowTitle.value.trim(),
-      now: elements.profileNow.value.trim(),
-      facts: textToFacts(elements.profileFacts.value),
-    };
+    contentData.profile = markdownToProfile(elements.profileMarkdown.value);
   }
 
   function syncLinksFromForm() {

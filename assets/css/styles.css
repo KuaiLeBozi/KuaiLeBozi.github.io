@@ -1016,7 +1016,7 @@ a {
 .profile-editor,
 .links-editor {
   display: grid;
-  gap: 16px;
+  gap: 10px;
 }
 
 .project-editor[hidden],
@@ -1072,6 +1072,35 @@ a {
   border-color: var(--line);
   color: white;
   background: linear-gradient(135deg, var(--blue-500), var(--blue-700));
+}
+
+.markdown-editor {
+  padding: 0;
+}
+
+.markdown-editor label {
+  gap: 10px;
+}
+
+.markdown-textarea {
+  min-height: min(58vh, 680px);
+  font-family: "Cascadia Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.94rem;
+  line-height: 1.72;
+  white-space: pre;
+  tab-size: 2;
+}
+
+.markdown-help {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.55;
+  background: rgba(255, 255, 255, 0.22);
 }
 
 .admin-form input,

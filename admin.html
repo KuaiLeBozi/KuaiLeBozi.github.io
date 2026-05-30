@@ -45,7 +45,6 @@
 
         <nav class="nav-links" aria-label="编辑页操作">
           <a class="nav-tab" href="index.html">首页</a>
-          <a class="nav-tab is-active" href="admin.html">管理</a>
           <a class="nav-tab" id="previewLink" href="index.html?panel=projects">预览</a>
         </nav>
       </header>
@@ -86,88 +85,28 @@
               <button class="action-link" id="saveProject" type="submit">保存到 GitHub</button>
             </div>
 
-            <div class="project-editor" id="projectEditor">
-            <label>
-              Blog 标题
-              <input id="projectTitleInput" type="text" />
-            </label>
-
-            <div class="admin-row">
+            <div class="project-editor markdown-editor" id="projectEditor">
               <label>
-                类型
-                <input id="projectTypeInput" type="text" />
+                Blog Markdown
+                <textarea class="markdown-textarea" id="projectMarkdownInput" rows="22" spellcheck="false"></textarea>
               </label>
-              <label>
-                状态
-                <input id="projectStatusInput" type="text" />
-              </label>
-              <label>
-                更新时间
-                <input id="projectUpdatedInput" type="date" />
-              </label>
+              <p class="markdown-help">使用 YAML 头部维护 type/status/updated/tags。正文里 `#` 是标题，标题后的第一段会作为列表摘要，`## Links` 下面写 `- 标题 | 链接`。</p>
             </div>
 
-            <label>
-              简介
-              <textarea id="projectSummaryInput" rows="4"></textarea>
-            </label>
-
-            <label>
-              标签
-              <input id="projectTagsInput" type="text" placeholder="用逗号分隔，例如 Diffusion, AI, Notes" />
-            </label>
-
-            <label>
-              正文区块
-              <textarea id="projectSectionsInput" rows="12" placeholder="像写日记/Blog 一样写。每个区块用空行分隔，第一行是小标题，后面是正文。"></textarea>
-            </label>
-
-            <label>
-              链接
-              <textarea id="projectLinksInput" rows="5" placeholder="每行一个链接：标题 | https://example.com"></textarea>
-            </label>
+            <div class="profile-editor markdown-editor" id="profileEditor" hidden>
+              <label>
+                主页 Markdown
+                <textarea class="markdown-textarea" id="profileMarkdownInput" rows="22" spellcheck="false"></textarea>
+              </label>
+              <p class="markdown-help">`#` 是欢迎标题，开头第一段是首页简介；`## About`、`## Now`、`## Facts` 会分别写入主界面的档案、当前状态和字段列表。</p>
             </div>
 
-            <div class="profile-editor" id="profileEditor" hidden>
+            <div class="links-editor markdown-editor" id="linksEditor" hidden>
               <label>
-                首页眉标
-                <input id="profileEyebrowInput" type="text" />
+                联系 Markdown
+                <textarea class="markdown-textarea" id="siteLinksInput" rows="16" spellcheck="false" placeholder="- QQ | 2406659686 | QQ: 2406659686"></textarea>
               </label>
-              <label>
-                欢迎标题
-                <input id="profileTitleInput" type="text" />
-              </label>
-              <label>
-                首页简介
-                <textarea id="profileBioInput" rows="3"></textarea>
-              </label>
-              <label>
-                档案名
-                <input id="profileNameInput" type="text" />
-              </label>
-              <label>
-                个人介绍
-                <textarea id="profileAboutInput" rows="5"></textarea>
-              </label>
-              <label>
-                当前状态标题
-                <input id="profileNowTitleInput" type="text" />
-              </label>
-              <label>
-                当前状态正文
-                <textarea id="profileNowInput" rows="4"></textarea>
-              </label>
-              <label>
-                档案字段
-                <textarea id="profileFactsInput" rows="6" placeholder="每行一个字段：标题 | 内容"></textarea>
-              </label>
-            </div>
-
-            <div class="links-editor" id="linksEditor" hidden>
-              <label>
-                联系与传送门
-                <textarea id="siteLinksInput" rows="8" placeholder="每行一个联系方式：标题 | 值 | 展示文本，例如 QQ | 2406659686 | QQ: 2406659686"></textarea>
-              </label>
+              <p class="markdown-help">每行一条：`- 标题 | 值或链接 | 点开后显示的文字`。链接以 `https://` 或 `mailto:` 开头会在新标签页打开。</p>
             </div>
 
             <p class="admin-status" id="adminStatus">正在读取项目数据。</p>
