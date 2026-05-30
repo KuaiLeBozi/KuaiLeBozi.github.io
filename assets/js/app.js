@@ -10,6 +10,7 @@
 
     const state = {
       entered: false,
+      backgroundReady: false,
       musicIndex: 0,
       musicReady: false,
       musicPlaying: false,
@@ -249,13 +250,17 @@
     }
 
     function enableEnterButton() {
+      if (!state.backgroundReady) return;
       elements.enterButton.disabled = false;
       elements.enterButton.classList.add("is-ready");
       elements.enterButton.querySelector("small").textContent = "进入基沃托斯";
     }
 
     function initEntry() {
-      enableEnterButton();
+      elements.enterButton.disabled = true;
+      elements.enterButton.classList.remove("is-ready");
+      elements.enterButton.querySelector("small").textContent = "背景加载中...";
+      if (state.backgroundReady) enableEnterButton();
     }
 
     function setMusicTrack(index) {
@@ -492,6 +497,11 @@
 
     function handleLiveDialogMessage(event) {
       if (event.origin !== window.location.origin) return;
+      if (event.data?.source === "kuailebozi-live-ready") {
+        state.backgroundReady = true;
+        enableEnterButton();
+        return;
+      }
       if (event.data?.source !== "kuailebozi-live-dialog") return;
 
       const text = String(event.data.text || "").trim();

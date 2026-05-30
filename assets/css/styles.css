@@ -223,6 +223,13 @@ a {
   box-shadow: 0 22px 52px rgba(14, 92, 174, 0.45);
 }
 
+.enter-button:disabled {
+  cursor: wait !important;
+  filter: blur(1.2px) saturate(0.72);
+  opacity: 0.38;
+  pointer-events: none;
+}
+
 .enter-button span {
   font-size: 1rem;
 }

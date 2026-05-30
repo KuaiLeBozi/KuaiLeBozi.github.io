@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dynamic Background</title>
-    <link rel="stylesheet" href="./assets/live-background.css?v=screen-auto-3" />
+    <link rel="stylesheet" href="./assets/live-background.css?v=screen-auto-4" />
     <style>
       .setting-button,
       .setting,
@@ -171,8 +171,39 @@
         } else {
           initDialogBridge();
         }
+
+        function postBackgroundReady() {
+          window.parent?.postMessage({
+            source: "kuailebozi-live-ready",
+          }, window.location.origin);
+        }
+
+        function initReadyBridge() {
+          const app = document.getElementById("app");
+          let sent = false;
+
+          function maybeReady() {
+            if (sent) return;
+            const loading = document.getElementById("loading");
+            const canvas = document.querySelector("canvas");
+            if (loading || !canvas) return;
+            sent = true;
+            requestAnimationFrame(() => requestAnimationFrame(postBackgroundReady));
+          }
+
+          const observer = new MutationObserver(maybeReady);
+          observer.observe(app || document.body, { childList: true, subtree: true });
+          maybeReady();
+          window.setTimeout(maybeReady, 15000);
+        }
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", initReadyBridge, { once: true });
+        } else {
+          initReadyBridge();
+        }
       })();
     </script>
-    <script type="module" src="./assets/live-background.js?v=screen-auto-3"></script>
+    <script type="module" src="./assets/live-background.js?v=screen-auto-4"></script>
   </body>
 </html>
