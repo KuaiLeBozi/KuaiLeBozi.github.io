@@ -37,7 +37,7 @@
                                           ],
                            "AnimationIndex":  10,
                            "TextIndex":  0,
-                           "ClickType":  "click",
+                           "ClickType":  "pointerdown",
                            "EmptyAnimation":  true
                        },
                        {
