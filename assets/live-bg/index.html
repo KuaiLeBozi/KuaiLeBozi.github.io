@@ -38,9 +38,15 @@
             try {
               const data = JSON.parse(this.responseText);
               const model = data.SettingModel;
-
+              const isMobile = window.innerWidth <= 700;
               model.version = 9010;
-              model.resolution = "2k";
+              model.resolution = "8k";
+              if (isMobile) {
+                model.scale = 0.75;
+                model.x = 1282;
+                model.y = 1433;
+              }
+
               model.bgmVolume = 0;
               model.talkVolume = 0.82;
               model.panelDisplay = false;
