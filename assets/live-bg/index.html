@@ -51,7 +51,7 @@
               const width = window.visualViewport?.width || window.innerWidth;
               const height = window.visualViewport?.height || window.innerHeight;
               const isMobile = width <= 700;
-              const isLaptop1080p = !isMobile && width <= 1920 && height <= 1080;
+              //const isLaptop1080p = !isMobile && width <= 1920 && height <= 1080;
 
               model.version = 9010;
               model.resolution = "8k";
@@ -80,7 +80,7 @@
 
                 model.scale = Number((0.5 * fit).toFixed(4));
                 model.x = Math.round(100 * fit + xOffset);
-                model.y = Math.round(900 * fit + yOffset);
+                model.y = Math.round(400 * fit + yOffset);
               }
 
               model.bgmVolume = 0;
