@@ -1,12 +1,12 @@
 {
   "profile": {
-    "eyebrow": "联邦搜查部 Schale / 个人档案",
+    "eyebrow": "沙勒 Schale / 个人档案",
     "title": "欢迎，老师。",
     "bio": "这里是 KuaileBozi 的个人主页，用来收纳项目、笔记、研究记录和一些正在进行的小实验。XWX",
     "name": "KuaileBozi",
-    "about": "华中科技大学网络空间安全学院 2024 级学生，目前在实习与探索 diffusion 等方向。华科七边形一员，努力把有趣的想法做成能跑起来的小东西。XWX",
-    "nowTitle": "正在实习与研究 diffusion",
-    "now": "当前关注方向包括生成模型、网络空间安全、前端交互和一些个人实验项目。欢迎用 GitHub 账号在下方留言交流。>w<",
+    "about": "华中科技大学网络空间安全学院 2024 级学生，目前在实习与探索loop transformer等方向。努力把有趣的想法做成能跑起来的小东西。XWX",
+    "nowTitle": "正在实习与研究 loop transformer",
+    "now": "当前关注方向包括生成模型、前端交互和一些个人实验项目。欢迎用 GitHub 账号在下方留言交流。>w<",
     "facts": [
       [
         "Site",
@@ -26,7 +26,7 @@
       ],
       [
         "Team",
-        "华科七边形"
+        "目前莫有"
       ]
     ]
   },
@@ -76,32 +76,33 @@
     },
     {
       "id": "security",
-      "type": "Cybersecurity",
-      "title": "网安学习记录",
+      "type": "科研论文QWQ",
+      "title": "学习记录",
       "summary": "整理网络空间安全课程、竞赛训练、工程实践与安全研究中的笔记和资料。",
       "status": "持续整理",
       "updated": "2026-05-29",
       "tags": [
-        "Cybersecurity",
         "HUST",
         "Notes"
       ],
       "sections": [
         {
           "heading": "记录范围",
-          "body": "用于收纳课程笔记、实验记录、竞赛训练、工程实践，以及之后想公开分享的安全方向文章。"
+          "body": "用于收纳课程笔记、实验记录、竞赛训练、工程实践，以及之后想公开分享的AI方向文章。"
         },
         {
-          "heading": "维护方式",
-          "body": "内容通过后台写入这个 JSON 文件，更新后推送到 GitHub Pages 即可展示。"
+          "heading": "之后会写一写自己的小收获？",
+          "body": ""
         }
       ],
       "links": [
         {
           "label": "GitHub 主页",
-          "url": "https://github.com/KuaiLeBozi"
+          "url": "https://github.com/KuaiLeBozi",
+          "description": "GitHub 主页: https://github.com/KuaiLeBozi"
         }
-      ]
+      ],
+      "description": "整理网络空间安全课程、竞赛训练、工程实践与安全研究中的笔记和资料。"
     },
     {
       "id": "homepage",
@@ -128,9 +129,11 @@
       "links": [
         {
           "label": "查看仓库",
-          "url": "https://github.com/KuaiLeBozi/KuaiLeBozi.github.io"
+          "url": "https://github.com/KuaiLeBozi/KuaiLeBozi.github.io",
+          "description": "查看仓库: https://github.com/KuaiLeBozi/KuaiLeBozi.github.io"
         }
-      ]
+      ],
+      "description": "把喜欢的视觉风格、动态背景、固定音乐播放器和评论区组合成可访问的个人空间。"
     }
   ]
 }
