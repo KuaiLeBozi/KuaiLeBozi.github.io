@@ -1180,7 +1180,9 @@ a {
   .live-background,
   .scene-overlay,
   .hud-grid {
-    height: 100svh;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 100svh;
   }
 
   .scene-overlay {
