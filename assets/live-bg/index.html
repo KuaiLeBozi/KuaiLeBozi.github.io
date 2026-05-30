@@ -58,7 +58,7 @@
 
               // 大屏/2K 默认不覆盖 x/y/scale，直接使用 loadJson.json 里的原始值。
               // 1920x1080 笔记本屏：在这里调人物大小和位置。
-              if (isLaptop1080p) {
+              /*if (isLaptop1080p) {
                 const baseWidth = 1920;
                 const baseHeight = 1080;
                 const fit = Math.max(width / baseWidth, height / baseHeight);
@@ -68,7 +68,7 @@
                 model.scale = Number((0.8 * fit).toFixed(4));
                 model.x = Math.round(500 * fit + xOffset);
                 model.y = 1000//Math.round(100 * fit + yOffset);
-              }
+              }*/
 
               // 手机屏：在这里单独调人物大小和位置。
               if (isMobile) {
