@@ -352,16 +352,17 @@
     }
 
     function createForwardedMouseEvent(type, sourceEvent, options = {}) {
+      const point = sourceEvent.changedTouches?.[0] || sourceEvent.touches?.[0] || sourceEvent;
       const eventInit = {
         bubbles: true,
         cancelable: true,
         composed: true,
-        clientX: sourceEvent.clientX,
-        clientY: sourceEvent.clientY,
-        screenX: sourceEvent.screenX,
-        screenY: sourceEvent.screenY,
-        button: sourceEvent.button,
-        buttons: sourceEvent.buttons,
+        clientX: point.clientX,
+        clientY: point.clientY,
+        screenX: point.screenX,
+        screenY: point.screenY,
+        button: sourceEvent.button || 0,
+        buttons: sourceEvent.buttons || 0,
         ctrlKey: sourceEvent.ctrlKey,
         altKey: sourceEvent.altKey,
         shiftKey: sourceEvent.shiftKey,
@@ -394,34 +395,50 @@
       return event;
     }
 
-    function forwardLiveBackgroundPointer(event) {
-      const liveDocument = elements.liveBackground.contentDocument;
-      const target = liveDocument?.elementFromPoint(event.clientX, event.clientY);
-      if (!target) return;
-
+    function createForwardedPointerEvent(type, sourceEvent, options = {}) {
+      const point = sourceEvent.changedTouches?.[0] || sourceEvent.touches?.[0] || sourceEvent;
       const PointerEventCtor = elements.liveBackground.contentWindow?.PointerEvent || window.PointerEvent;
+      const eventInit = {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        clientX: point.clientX,
+        clientY: point.clientY,
+        screenX: point.screenX,
+        screenY: point.screenY,
+        button: sourceEvent.button || 0,
+        buttons: sourceEvent.buttons || 0,
+        ctrlKey: sourceEvent.ctrlKey,
+        altKey: sourceEvent.altKey,
+        shiftKey: sourceEvent.shiftKey,
+        metaKey: sourceEvent.metaKey,
+        pointerId: options.pointerId || sourceEvent.pointerId || 1,
+        pointerType: options.pointerType || sourceEvent.pointerType || "mouse",
+        isPrimary: options.isPrimary ?? sourceEvent.isPrimary ?? true,
+        width: sourceEvent.width || 1,
+        height: sourceEvent.height || 1,
+        pressure: options.pressure ?? sourceEvent.pressure ?? 0.5,
+        ...options,
+      };
+
       if (typeof PointerEventCtor === "function") {
-        target.dispatchEvent(new PointerEventCtor(event.type, {
-          bubbles: true,
-          cancelable: true,
-          composed: true,
-          clientX: event.clientX,
-          clientY: event.clientY,
-          screenX: event.screenX,
-          screenY: event.screenY,
-          button: event.button,
-          buttons: event.buttons,
-          ctrlKey: event.ctrlKey,
-          altKey: event.altKey,
-          shiftKey: event.shiftKey,
-          metaKey: event.metaKey,
-          pointerId: event.pointerId,
-          pointerType: event.pointerType,
-          isPrimary: event.isPrimary,
-          width: event.width,
-          height: event.height,
-          pressure: event.pressure,
-        }));
+        return new PointerEventCtor(type, eventInit);
+      }
+
+      return createForwardedMouseEvent(type, sourceEvent, options);
+    }
+
+    function getLiveBackgroundTarget(clientX, clientY) {
+      const liveDocument = elements.liveBackground.contentDocument;
+      return liveDocument?.elementFromPoint(clientX, clientY);
+    }
+
+    function forwardLiveBackgroundPointer(event) {
+      const target = getLiveBackgroundTarget(event.clientX, event.clientY);
+      if (!target) return false;
+
+      if (typeof (elements.liveBackground.contentWindow?.PointerEvent || window.PointerEvent) === "function") {
+        target.dispatchEvent(createForwardedPointerEvent(event.type, event));
       } else {
         const mouseType = {
           pointerdown: "mousedown",
@@ -438,11 +455,39 @@
       if (event.type === "pointerup") {
         target.dispatchEvent(createForwardedMouseEvent("click", event, { buttons: 0 }));
       }
+
+      return true;
     }
 
     function handleLiveBackgroundTouch(event) {
       if (!shouldForwardTouch(event)) return;
       forwardLiveBackgroundPointer(event);
+    }
+
+    function handleLiveBackgroundTap(event) {
+      if (!shouldForwardTouch(event)) return;
+
+      const touch = event.changedTouches?.[0] || event.touches?.[0];
+      if (!touch) return;
+
+      const target = getLiveBackgroundTarget(touch.clientX, touch.clientY);
+      if (!target) return;
+
+      target.dispatchEvent(createForwardedPointerEvent("pointerdown", event, {
+        buttons: 1,
+        pointerId: touch.identifier || 1,
+        pointerType: "touch",
+        isPrimary: true,
+      }));
+      target.dispatchEvent(createForwardedMouseEvent("mousedown", event, { buttons: 1 }));
+      target.dispatchEvent(createForwardedPointerEvent("pointerup", event, {
+        buttons: 0,
+        pointerId: touch.identifier || 1,
+        pointerType: "touch",
+        isPrimary: true,
+      }));
+      target.dispatchEvent(createForwardedMouseEvent("mouseup", event, { buttons: 0 }));
+      target.dispatchEvent(createForwardedMouseEvent("click", event, { buttons: 0 }));
     }
 
     function handleLiveDialogMessage(event) {
@@ -666,6 +711,7 @@
       document.addEventListener("pointerdown", handleLiveBackgroundTouch, true);
       document.addEventListener("pointermove", handleLiveBackgroundTouch, true);
       document.addEventListener("pointerup", handleLiveBackgroundTouch, true);
+      document.addEventListener("touchend", handleLiveBackgroundTap, { capture: true, passive: true });
       window.addEventListener("message", handleLiveDialogMessage);
     }
 
