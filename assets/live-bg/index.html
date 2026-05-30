@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dynamic Background</title>
-    <link rel="stylesheet" href="./assets/live-background.css?v=screen-auto-5" />
+    <link rel="stylesheet" href="./assets/live-background.css?v=screen-auto-6" />
     <style>
       .setting-button,
       .setting,
@@ -52,7 +52,7 @@
               const height = window.visualViewport?.height || window.innerHeight;
               const isCoarsePointer = window.matchMedia?.("(pointer: coarse)")?.matches || false;
               const isMobile = width <= 700 && isCoarsePointer;
-              const isLaptop1080p = !isMobile && width <= 3000 && height <= 2000;
+              const isLaptop1080p = !isMobile && width <= 1920 && height <= 1080;
 
               model.version = 9010;
               model.resolution = "8k";
@@ -60,15 +60,9 @@
               // 大屏/2K 默认不覆盖 x/y/scale，直接使用 loadJson.json 里的原始值。
               // 1920x1080 笔记本屏：在这里调人物大小和位置。
               if (isLaptop1080p) {
-                const baseWidth = 1920;
-                const baseHeight = 1080;
-                const fit = Math.max(width / baseWidth, height / baseHeight);
-                const xOffset = (width - baseWidth * fit) / 2;
-                const yOffset = (height - baseHeight * fit) / 2;
-
-                model.scale = Number((0.4 * fit).toFixed(4));
-                model.x = Math.round(5 * fit + xOffset);
-                model.y = Math.round(5 * fit + yOffset);
+                model.scale = 0.4;
+                model.x = 5;
+                model.y = 5;
               }
 
               // 手机屏：在这里单独调人物大小和位置。
@@ -205,6 +199,6 @@
         }
       })();
     </script>
-    <script type="module" src="./assets/live-background.js?v=screen-auto-5"></script>
+    <script type="module" src="./assets/live-background.js?v=screen-auto-6"></script>
   </body>
 </html>
