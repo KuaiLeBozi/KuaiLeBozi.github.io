@@ -44,11 +44,11 @@
               const isLaptop1080p = !isMobile && width <= 1920 && height <= 1080;
 
               model.version = 9010;
-              model.resolution = "8k";
+              model.resolution = "2k";
 
               // 大屏/2K 默认不覆盖 x/y/scale，直接使用 loadJson.json 里的原始值。
               // 1920x1080 笔记本屏：在这里调人物大小和位置。
-              /*if (isLaptop1080p) {
+              if (isLaptop1080p) {
                 model.scale = 0.2;
                 model.x = 2400;
                 model.y = 1600;
@@ -59,7 +59,7 @@
                 model.scale = 0.8;
                 model.x = 1282;
                 model.y = 1600;
-              }*/
+              }
 
               model.bgmVolume = 0;
               model.talkVolume = 0.82;
