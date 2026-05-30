@@ -18,7 +18,7 @@
                          "textY":  495,
                          "textSize":  16,
                          "autoTalk":  0,
-                         "resolution":  "2k",
+                         "resolution":  "8k",
                          "startAnimation":  "Start_Idle_01",
                          "startScene":  true,
                          "language":  "中文"
