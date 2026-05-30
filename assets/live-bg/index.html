@@ -51,7 +51,8 @@
               const width = window.visualViewport?.width || window.innerWidth;
               const height = window.visualViewport?.height || window.innerHeight;
               const isCoarsePointer = window.matchMedia?.("(pointer: coarse)")?.matches || false;
-              const isMobile = width <= 700 && isCoarsePointer;
+              const isMobile = width <= 700 && isCoarsePointer &&
+              window.matchMedia?.("(pointer: coarse)")?.matches;
               const isLaptop1080p = !isMobile && width <= 1920 && height <= 1080;
 
               model.version = 9010;
