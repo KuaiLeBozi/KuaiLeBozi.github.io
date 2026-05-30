@@ -14,6 +14,7 @@
       musicIndex: 0,
       musicReady: false,
       musicPlaying: false,
+      playerCompact: false,
       projects: [],
       playerDragging: false,
       playerMoved: false,
@@ -62,6 +63,7 @@
       panelViews: $$(".panel-view"),
       customCursor: $("#customCursor"),
       fixedPlayer: $("#fixedPlayer"),
+      playerResize: $("#playerResize"),
       musicToggle: $("#musicToggle"),
       musicTitle: $("#musicTitle"),
       musicPrev: $("#musicPrev"),
@@ -340,6 +342,17 @@
 
     function changeMusicVolume(delta) {
       setMusicVolume(elements.siteMusic.volume + delta);
+    }
+
+    function setPlayerCompact(isCompact) {
+      state.playerCompact = isCompact;
+      elements.fixedPlayer.classList.toggle("is-compact", isCompact);
+      elements.playerResize.setAttribute("aria-pressed", String(isCompact));
+      elements.playerResize.setAttribute("aria-label", isCompact ? "展开播放器" : "缩小播放器");
+    }
+
+    function togglePlayerSize() {
+      setPlayerCompact(!state.playerCompact);
     }
 
     function clamp(value, min, max) {
@@ -623,7 +636,7 @@
     }
 
     function startPlayerDrag(event) {
-      if (event.target.closest(".music-toggle, .music-control, .music-select")) return;
+      if (event.target.closest(".player-resize, .music-toggle, .music-control, .music-select")) return;
 
       const rect = elements.fixedPlayer.getBoundingClientRect();
       state.playerDragging = true;
@@ -686,6 +699,7 @@
       document.addEventListener("pointerup", stopPlayerDrag, true);
       document.addEventListener("pointercancel", stopPlayerDrag, true);
       elements.fixedPlayer.addEventListener("lostpointercapture", stopPlayerDrag);
+      elements.playerResize.addEventListener("click", togglePlayerSize);
       elements.musicToggle.addEventListener("click", handlePlayerToggle);
       elements.musicPrev.addEventListener("click", playPreviousTrack);
       elements.musicNext.addEventListener("click", playNextTrack);
