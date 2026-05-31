@@ -58,7 +58,7 @@
       "sections": [
         {
           "heading": "当前目标",
-          "body": "系统整理 transformer相关基础、常用训练流程和推理优化方法，把实习中的学习内容沉淀成清晰的记录。"
+          "body": "系统整理 transformer相关基础、常用训练流程和推理优化方法，将drift model和looped transformer结合起来。"
         },
         {
           "heading": "计划内容",
